@@ -12,6 +12,10 @@
 - [x] **Generation Coverage v0.3: intera 2ª media eseguibile per Matematica e Inglese**
 - [x] **Generation Coverage v0.4: intera 3ª media eseguibile + triennio completo Matematica e Inglese**
 - [x] **Reliability v0.5: simulazioni longitudinali + calibrazione mastery**
+- [x] **Language Expansion v0.6: Italiano + Francese + Spagnolo, triennio completo**
+- [ ] **Upper Secondary Architecture v0.7: struttura 1ª-5ª superiore e indirizzi**
+- [ ] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
+- [ ] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
@@ -68,30 +72,67 @@ Non-obiettivi: UI completa, database applicativo, login/account, integrazione di
 - [x] confronto locale di configurazioni candidate senza modifica automatica della policy;
 - [x] runner unico di validazione locale, senza GitHub Actions.
 
-## v0.6 — Nuove materie
+## v0.6 — Language Expansion
 
-Portare il framework comune su almeno due discipline non isomorfe alla matematica:
+Obiettivo: dimostrare che l'architettura di TutorLab regge una lingua madre e due seconde lingue comunitarie senza duplicare il motore.
 
-- Italiano;
-- una tra Scienze, Storia o Geografia.
+- [x] Language Core comune per ricezione, produzione, interazione, mediazione, risorse linguistiche e strategie;
+- [x] Italiano 1ª-3ª media: 45 nodi curricolari eseguibili;
+- [x] Francese 1ª-3ª media: 46 nodi, progressione interna verso A1;
+- [x] Spagnolo 1ª-3ª media: 46 nodi, progressione interna verso A1;
+- [x] schema curricolare linguistico unico per Inglese, Italiano, Francese e Spagnolo;
+- [x] mastery rubric dedicate alle famiglie disciplinari e comunicative;
+- [x] generation coverage completa dei 137 nuovi nodi;
+- [x] 685 combinazioni adattive `recover/consolidate/advance/extend/reassess` nel controllo locale;
+- [x] quality gate semantico sui worked example e materiale linguistico concreto;
+- [x] controllo di diversità/fingerprint e separazione Tutor View / Student View;
+- [x] vertical slice end-to-end per Italiano, Francese e Spagnolo fino a evidence/state/next step;
+- [x] fonti MIM 2025 e QCER/CEFR versionate;
+- [x] nessun GitHub Actions/Workflow.
 
-Obiettivo: verificare che l'architettura sia realmente multidisciplinare.
+## v0.7 — Upper Secondary Architecture
 
-## v0.7 — Esperienza Tutor
+Prima di estendere i contenuti, TutorLab deve rappresentare correttamente la secondaria di secondo grado.
+
+- [ ] introdurre `upper_secondary` come school stage mantenendo compatibilità con `middle_school`;
+- [ ] modellare anni 1ª-5ª;
+- [ ] modellare indirizzo/percorso scolastico senza assumere un unico programma nazionale identico per tutti;
+- [ ] distinguere core comune, competenze trasversali e nodi specifici dell'indirizzo;
+- [ ] versionare i profili curricolari e le fonti normative;
+- [ ] definire prerequisiti verticali medie → superiori;
+- [ ] estendere Learning Snapshot, target selector e capability registry al nuovo stage;
+- [ ] aggiungere test locali di compatibilità retroattiva con l'intero triennio delle medie.
+
+## v0.8 — Matematica + Inglese 1ª-5ª superiore
+
+- [ ] curriculum Matematica per i principali profili/indirizzi;
+- [ ] curriculum Inglese con progressione A2 → B1 → B2 coerente con il percorso;
+- [ ] generation coverage completa;
+- [ ] mastery rubric e Difficulty Engine calibrati per il nuovo stage;
+- [ ] vertical slice completi per biennio e triennio;
+- [ ] validazione locale senza workflow a pagamento.
+
+La realizzazione potrà essere divisa internamente in due grandi sotto-blocchi, 1ª-2ª e 3ª-5ª, ma la copertura finale deve restare un unico percorso verticale interrogabile dal motore.
+
+## v0.9 — Longitudinal Reliability 8-year
+
+- [ ] simulazioni sintetiche dalla 1ª media alla 5ª superiore;
+- [ ] recuperi che possono attraversare il confine tra cicli scolastici;
+- [ ] controllo di ritorno all'obiettivo sospeso dopo recuperi profondi;
+- [ ] calibrazione delle soglie per stage e famiglie di competenze;
+- [ ] metriche su avanzamento prematuro, stagnazione, falsi recuperi e stabilità nel tempo.
+
+## Esperienza Tutor e Hub Scuola
+
+Restano obiettivi strategici successivi alla solidità curricolare verticale:
 
 - comandi ad alto livello, es. «preparami 40 minuti»;
-- output pronto per lezione;
-- modalità diagnosi, recupero, verifica e ripasso;
+- output pronto per lezione e verifica;
 - controllo esplicito di tempo, difficoltà e quantità;
-- esportazione strutturata delle evidenze.
-
-## v0.8 — Integrazione Hub Scuola
-
 - adapter tra storage Hub Scuola e Learning Snapshot;
-- uso del contratto Plan / Transition senza accoppiare le UI;
-- persistenza di attività, evidenze e prossimo obiettivo lato applicazione;
-- TutorLab indipendente dal database di Hub Scuola.
+- persistenza applicativa di attività, evidenze e prossimo obiettivo;
+- TutorLab indipendente dal database e dalla UI di Hub Scuola.
 
 ## v1.0 — TutorLab stabile
 
-TutorLab 1.0 deve poter ricevere uno stato didattico, scegliere un obiettivo coerente, verificare prerequisiti, costruire una sessione, interpretare i risultati, proporre il passo successivo e motivare ogni decisione in modo verificabile dal tutor.
+TutorLab 1.0 deve poter ricevere uno stato didattico, scegliere un obiettivo coerente, verificare prerequisiti, costruire una sessione, interpretare i risultati, proporre il passo successivo e motivare ogni decisione in modo verificabile dal tutor, su una copertura curricolare sufficientemente ampia e testata longitudinalmente.
