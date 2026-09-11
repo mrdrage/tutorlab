@@ -1,27 +1,49 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "max_recovery_depth": 2,
   "min_decision_confidence": 0.55,
   "min_events_secure": 3,
   "min_independent_for_advance": 2,
+  "min_independent_for_recovery_exit": 1,
+  "contradiction_threshold": 0.7,
+  "contradiction_window": 8,
+  "hypothesis_clean_success_decay": 0.65,
+  "post_recovery_reassess": true,
   "advance": {
     "accuracy": 0.78,
     "independence": 0.68,
     "stability": 0.66,
     "transfer": 0.45,
-    "confidence": 0.70
+    "confidence": 0.7
   },
   "extend": {
     "accuracy": 0.88,
     "independence": 0.82,
-    "stability": 0.80,
+    "stability": 0.8,
     "transfer": 0.68,
-    "confidence": 0.80
+    "confidence": 0.8
   },
-  "strong_error_hypothesis": 0.70,
-  "block_advance_errors": ["conceptual_error", "missing_prerequisite", "persistent_difficulty"],
-  "recover_preferred_errors": ["missing_prerequisite"],
-  "consolidate_preferred_errors": ["procedure_error", "strategy_selection", "not_automated"],
+  "recovery_exit": {
+    "accuracy": 0.64,
+    "independence": 0.52,
+    "stability": 0.46,
+    "transfer": 0.2,
+    "confidence": 0.62
+  },
+  "strong_error_hypothesis": 0.7,
+  "block_advance_errors": [
+    "conceptual_error",
+    "missing_prerequisite",
+    "persistent_difficulty"
+  ],
+  "recover_preferred_errors": [
+    "missing_prerequisite"
+  ],
+  "consolidate_preferred_errors": [
+    "procedure_error",
+    "strategy_selection",
+    "not_automated"
+  ],
   "supported_success_weights": {
     "none": 1.0,
     "light_prompt": 0.9,
@@ -29,5 +51,5 @@
     "worked_support": 0.45,
     "direct_solution": 0.1
   },
-  "note": "Default operativi configurabili. Non sono soglie cliniche o psicometriche."
+  "note": "Default operativi calibrati su simulazioni longitudinali sintetiche. Non sono soglie cliniche, psicometriche o una validazione su studenti reali."
 }
