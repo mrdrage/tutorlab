@@ -27,6 +27,7 @@ def _event(
     session_index: int,
     item_index: int,
     rng: random.Random,
+    prerequisite_skill: float | None,
 ) -> dict[str, Any]:
     dependence = profile.support_dependence if competency_id == profile.target else max(0.0, profile.support_dependence - 0.2)
     support = _support_level(rng, dependence, item_index)
@@ -50,7 +51,12 @@ def _event(
         outcome["explanation_quality"] = _clamp(latent_skill - 0.05 + rng.gauss(0.0, profile.volatility))
 
     observations = []
-    if status != "correct" and competency_id == profile.target and profile.error_code:
+    can_attribute_error = (
+        profile.error_code != "missing_prerequisite"
+        or prerequisite_skill is None
+        or prerequisite_skill < 0.60
+    )
+    if status != "correct" and competency_id == profile.target and profile.error_code and can_attribute_error:
         observations.append({
             "code": profile.error_code,
             "related_competency_id": profile.prerequisite if profile.error_code == "missing_prerequisite" else None,
@@ -119,7 +125,7 @@ def run_profile(profile: SyntheticProfile, policy: dict[str, Any], *, seed: int,
 
         actions.append(next_session_action)
         for item_index in range(4):
-            events.append(_event(profile, competency_id, latent, session_index, item_index, rng))
+            events.append(_event(profile, competency_id, latent, session_index, item_index, rng, prerequisite_skill))
 
         if in_recovery:
             if next_session_action in {"recover", "consolidate"}:
