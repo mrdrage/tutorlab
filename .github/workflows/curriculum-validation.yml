@@ -1,0 +1,31 @@
+name: Curriculum validation
+
+on:
+  pull_request:
+    paths:
+      - 'curriculum/**'
+      - 'schemas/**'
+      - 'tools/**'
+      - 'tests/curriculum/**'
+      - '.github/workflows/curriculum-validation.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'curriculum/**'
+      - 'schemas/**'
+      - 'tools/**'
+      - 'tests/curriculum/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate mathematics curriculum
+        run: python3 tools/validate_curriculum.py
+      - name: Validate English curriculum
+        run: python3 tools/check_english_curriculum.py
