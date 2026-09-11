@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 OUTCOME_VALUE = {
@@ -93,10 +93,10 @@ def aggregate_competency_state(
     events: list[dict[str, Any]],
     policy: dict[str, Any],
 ) -> dict[str, Any]:
-    """Build a transparent competency state from immutable evidence events.
+    """Build a reproducible state estimate from immutable evidence events.
 
-    The estimator is deliberately simple. It creates a reproducible baseline for
-    TutorLab v0.1, not a psychometric claim about learning.
+    This is an engineering baseline for TutorLab v0.1, not a psychometric model.
+    Unknown dimensions keep confidence zero rather than being treated as weak skills.
     """
 
     relevant = [event for event in events if event.get("competency_id") == competency_id]
@@ -134,10 +134,7 @@ def aggregate_competency_state(
         elif "fluency_slow" in tags:
             fluency.append(0.35)
 
-    if len(scores) <= 1:
-        stability_values: list[float] = []
-    else:
-        stability_values = [1.0 - abs(a - b) for a, b in zip(scores, scores[1:])]
+    stability_values = [] if len(scores) <= 1 else [1.0 - abs(a - b) for a, b in zip(scores, scores[1:])]
 
     accuracy_estimate = _estimate(scores)
     independence_estimate = _estimate(independence)
@@ -158,12 +155,19 @@ def aggregate_competency_state(
     event_factor = min(1.0, len(relevant) / 6.0)
     confidence = round(_clamp(0.65 * event_factor + 0.35 * coverage), 4)
 
-    raw_success = [OUTCOME_VALUE.get(event.get("outcome", {}).get("status"), 0.0) for event in relevant if event.get("outcome", {}).get("status") in OUTCOME_VALUE]
+    hypotheses = _hypotheses(relevant)
+    raw_success = [
+        OUTCOME_VALUE[event.get("outcome", {}).get("status")]
+        for event in relevant
+        if event.get("outcome", {}).get("status") in OUTCOME_VALUE
+    ]
     if len(raw_success) < 3:
         contradiction = 0.0
     else:
         success_rate = sum(1 for value in raw_success if value >= 0.6) / len(raw_success)
-        contradiction = round(4 * success_rate * (1 - success_rate), 4)
+        outcome_variability = 4 * success_rate * (1 - success_rate)
+        strongest_explanation = hypotheses[0]["confidence"] if hypotheses else 0.0
+        contradiction = round(_clamp(outcome_variability * (1 - 0.75 * strongest_explanation)), 4)
 
     if confidence < 0.35:
         status = "unknown"
@@ -178,7 +182,24 @@ def aggregate_competency_state(
 
     observed_times = [event.get("observed_at") for event in relevant if event.get("observed_at")]
     independent_count = sum(1 for event in relevant if event.get("support", {}).get("level") == "none")
-    transfer_count = sum(1 for event in relevant if event.get("outcome", {}).get("transfer_success") is not None or event.get("task", {}).get("context_familiarity") in {"near_transfer", "farther_transfer"})
+    transfer_count = sum(
+        1
+        for event in relevant
+        if event.get("outcome", {}).get("transfer_success") is not None
+        or event.get("task", {}).get("context_familiarity") in {"near_transfer", "farther_transfer"}
+    )
+
+    evidence_summary: dict[str, Any] = {
+        "event_count": len(relevant),
+        "independent_event_count": independent_count,
+        "transfer_event_count": transfer_count,
+        "recent_success_streak": _success_streak(raw_success, True),
+        "recent_failure_streak": _success_streak(raw_success, False),
+        "contradiction_level": contradiction,
+    }
+    if observed_times:
+        evidence_summary["first_observed_at"] = observed_times[0]
+        evidence_summary["last_observed_at"] = observed_times[-1]
 
     return {
         "version": "0.1",
@@ -193,16 +214,7 @@ def aggregate_competency_state(
         },
         "confidence": confidence,
         "status": status,
-        "evidence_summary": {
-            "event_count": len(relevant),
-            "independent_event_count": independent_count,
-            "transfer_event_count": transfer_count,
-            "recent_success_streak": _success_streak(raw_success, True),
-            "recent_failure_streak": _success_streak(raw_success, False),
-            "first_observed_at": observed_times[0] if observed_times else None,
-            "last_observed_at": observed_times[-1] if observed_times else None,
-            "contradiction_level": contradiction,
-        },
-        "error_hypotheses": _hypotheses(relevant),
-        "updated_at": observed_times[-1] if observed_times else datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "evidence_summary": evidence_summary,
+        "error_hypotheses": hypotheses,
+        "updated_at": observed_times[-1] if observed_times else datetime.now(timezone.utc).isoformat(),
     }
