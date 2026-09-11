@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import random
 from statistics import mean, median, multimode
 
@@ -18,10 +17,10 @@ def area_concept(phase,seed,band,support,task_id):
 
 
 def areas_polygons(phase,seed,band,support,task_id):
-    r=_rng(seed); base=r.randint(4,14); height=r.randint(3,10); kind=r.choice(["triangolo","parallelogramma"]); area=base*height//2 if kind=="triangolo" else base*height; mode=phase_mode(phase)
+    r=_rng(seed); base=r.randint(4,14); height=r.randint(3,10); kind=r.choice(["triangolo","parallelogramma"]); area=base*height/2 if kind=="triangolo" else base*height; area_text=f"{area:g}"; mode=phase_mode(phase)
     if mode=="transfer":
-        return open_task(task_id,"math.y2.areas.strategy",f"Una figura composta contiene un {kind} con base {base} cm e altezza {height} cm. Spiega quali misure servono davvero e come useresti scomposizione o ricomposizione per trovare l'area.",band,support,params={"kind":kind,"base":base,"height":height},dimensions=["strategy_selection","representation","explanation"],acceptable=f"formula coerente; area del {kind} {area} cm²")
-    return task(task_id,"math.y2.areas.compute",f"Calcola l'area di un {kind} con base {base} cm e altezza {height} cm.",f"{area} cm²",band,support,params={"kind":kind,"base":base,"height":height},dimensions=["accuracy","procedure"])
+        return open_task(task_id,"math.y2.areas.strategy",f"Una figura composta contiene un {kind} con base {base} cm e altezza {height} cm. Spiega quali misure servono davvero e come useresti scomposizione o ricomposizione per trovare l'area.",band,support,params={"kind":kind,"base":base,"height":height},dimensions=["strategy_selection","representation","explanation"],acceptable=f"formula coerente; area del {kind} {area_text} cm²")
+    return task(task_id,"math.y2.areas.compute",f"Calcola l'area di un {kind} con base {base} cm e altezza {height} cm.",f"{area_text} cm²",band,support,params={"kind":kind,"base":base,"height":height},dimensions=["accuracy","procedure"])
 
 
 def cartesian_plane(phase,seed,band,support,task_id):
