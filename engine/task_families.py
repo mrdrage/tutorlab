@@ -29,9 +29,12 @@ for group in (
     REGISTRY.update(group)
 
 
-def fingerprint(family_id, params):
-    payload=json.dumps({"family_id":family_id,"params":params},sort_keys=True,ensure_ascii=False,separators=(",",":"))
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:20]
+def fingerprint(family_id, params, phase=None):
+    payload={"family_id":family_id,"params":params}
+    if phase is not None:
+        payload["phase"]=phase
+    encoded=json.dumps(payload,sort_keys=True,ensure_ascii=False,separators=(",",":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()[:20]
 
 
 def supported_competencies():
@@ -53,7 +56,7 @@ def build_unique_task(competency_id,phase,seed,band,support,task_id,history,max_
     last=None
     for attempt in range(max_attempts):
         item=builder(phase,seed+attempt*7919,band,support,task_id)
-        fp=fingerprint(item["family_id"],item.get("generation_parameters",{}))
+        fp=fingerprint(item["family_id"],item.get("generation_parameters",{}),phase)
         item["fingerprint"]=fp
         item["competency_id"]=competency_id
         last=item
