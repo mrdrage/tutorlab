@@ -8,7 +8,14 @@ def resolve(selection, stack, state, successor, policy, recovery_state=None):
 
     if len(stack.get("frames",[]))>1 and choice.action in {"advance","extend"}:
         stack=complete_current(stack)
-        return {"kind":"return_to","target":current_objective(stack),"stack":stack,"decision":choice}
+        resumed=current_objective(stack)
+        return {
+            "kind":"return_to",
+            "target":resumed,
+            "next_action":"reassess" if policy.get("post_recovery_reassess",True) else None,
+            "stack":stack,
+            "decision":choice,
+        }
 
     if choice.action=="recover" and choice.recovery_competency_id:
         stack=push_recovery(stack,choice.recovery_competency_id,reason=choice.rationale,max_depth=int(policy["max_recovery_depth"]))

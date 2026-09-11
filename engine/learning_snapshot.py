@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from engine.evidence_model import aggregate_competency_state
+from engine.reliability_state import calibrated_state
 
 
 def competency_state(snapshot, subject, competency_id):
@@ -35,7 +35,7 @@ def apply_evidence(snapshot, subject, events, policy, max_events=500):
     subject_state["evidence_events"] = history
     states = dict(subject_state.get("competency_states", {}))
     for competency_id in {item.get("competency_id") for item in events if item.get("competency_id")}:
-        states[competency_id] = aggregate_competency_state(competency_id, history, policy)
+        states[competency_id] = calibrated_state(competency_id, history, policy)
     subject_state["competency_states"] = states
     return updated
 

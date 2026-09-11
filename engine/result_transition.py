@@ -14,7 +14,18 @@ def transition(data,subject,session,result,policy):
     choice=route(competency_state(updated,subject,target),policy,target,suggested_successor(updated,subject,target),len(stack.get("frames",[]))-1)
 
     if len(stack.get("frames",[]))>1 and current_objective(stack)==target and choice.action in {"advance","extend"}:
-        stack=complete_current(stack); next_step={"action":"return_to","target":current_objective(stack),"reason":"recovery_secure"}
+        completed_recovery=target
+        stack=complete_current(stack)
+        resumed=current_objective(stack)
+        if policy.get("post_recovery_reassess",True):
+            next_step={
+                "action":"reassess",
+                "target":resumed,
+                "reason":"post_recovery_reassessment",
+                "resumed_from_recovery":completed_recovery,
+            }
+        else:
+            next_step={"action":"return_to","target":resumed,"reason":"recovery_secure"}
     elif choice.action=="recover" and choice.recovery_competency_id:
         try:
             stack=push_recovery(stack,choice.recovery_competency_id,reason=choice.rationale,max_depth=int(policy["max_recovery_depth"]))
