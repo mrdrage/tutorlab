@@ -5,7 +5,7 @@
 - [x] **Fondazioni pedagogiche + Difficulty Engine v0.1**
 - [x] **Curriculum Matematica 1ª-3ª media + grafo dei prerequisiti v0.1**
 - [x] **Curriculum Inglese 1ª-3ª media + progressione A1-A2**
-- [ ] **Motore adattivo: diagnosi, errori e decisione del passo successivo**
+- [x] **Motore adattivo: diagnosi, errori e decisione del passo successivo**
 - [ ] **Generazione di sessioni didattiche complete e criteri di qualità**
 - [ ] **Profili studente e contratto futuro con Hub Scuola**
 

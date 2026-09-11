@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.dev/schemas/diagnostic-plan.schema.json",
+  "title": "TutorLab Diagnostic Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["target_competency_id", "questions_to_resolve", "probes"],
+  "properties": {
+    "target_competency_id": {"type": "string", "minLength": 1},
+    "questions_to_resolve": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "probes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["competency_id", "purpose", "support", "variation"],
+        "properties": {
+          "competency_id": {"type": "string", "minLength": 1},
+          "purpose": {"type": "string", "minLength": 1},
+          "support": {"type": "string", "enum": ["none", "light_prompt", "structured_prompt", "worked_support"]},
+          "variation": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "example_id": "math-proportions-recovery-v0.1",
+  "student": "fictional-student-A",
+  "subject": "mathematics",
+  "target_competency_id": "math.numbers.proportions",
+  "objective_stack_before": {
+    "root_target_id": "math.numbers.proportions",
+    "frames": [
+      {
+        "competency_id": "math.numbers.proportions",
+        "kind": "target",
+        "reason": "requested_or_selected_target"
+      }
+    ]
+  },
+  "observations_summary": [
+    "Completa correttamente una proporzione quando i quattro termini sono già collocati.",
+    "In più contesti costruisce un rapporto invertendo o mescolando le grandezze.",
+    "Il pattern ricompare anche senza formula esplicita e con numeri semplici.",
+    "Non emergono errori sistematici nel calcolo del termine incognito una volta impostata la proporzione."
+  ],
+  "inference": {
+    "primary_hypothesis": "missing_prerequisite",
+    "related_competency_id": "math.numbers.ratios",
+    "confidence": 0.79,
+    "interpretation": "La procedura formale della proporzione è più forte della comprensione del rapporto che dovrebbe sostenerla."
+  },
+  "decision": {
+    "action": "recover",
+    "confidence": 0.79,
+    "suspended_target_id": "math.numbers.proportions",
+    "recovery_competency_id": "math.numbers.ratios",
+    "return_condition": "Almeno due evidenze indipendenti e una variazione di contesto mostrano che lo studente costruisce e interpreta rapporti coerenti.",
+    "reason_not_advance": "L'avanzamento verso percentuali renderebbe più fragile una catena già dipendente dal significato di rapporto.",
+    "reason_not_reteach_everything": "Il calcolo della proporzione già impostata è utilizzabile; il recupero deve colpire il prerequisito preciso."
+  },
+  "objective_stack_after": {
+    "root_target_id": "math.numbers.proportions",
+    "frames": [
+      {
+        "competency_id": "math.numbers.proportions",
+        "kind": "target",
+        "reason": "requested_or_selected_target"
+      },
+      {
+        "competency_id": "math.numbers.ratios",
+        "kind": "recovery",
+        "reason": "missing prerequisite",
+        "return_to": "math.numbers.proportions"
+      }
+    ]
+  },
+  "next_diagnostic_intent": [
+    "interpretare un rapporto tra grandezze omogenee e non omogenee in un contesto semplice",
+    "costruire il rapporto nel verso richiesto senza ricorrere al prodotto incrociato",
+    "spiegare verbalmente cosa rappresentano numeratore e denominatore del rapporto"
+  ],
+  "after_recovery": "Se il prerequisito viene confermato, TutorLab risale lo stack e verifica di nuovo math.numbers.proportions invece di proseguire su un nuovo argomento."
+}

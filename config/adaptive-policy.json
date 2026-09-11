@@ -1,0 +1,33 @@
+{
+  "version": "0.1",
+  "max_recovery_depth": 2,
+  "min_decision_confidence": 0.55,
+  "min_events_secure": 3,
+  "min_independent_for_advance": 2,
+  "advance": {
+    "accuracy": 0.78,
+    "independence": 0.68,
+    "stability": 0.66,
+    "transfer": 0.45,
+    "confidence": 0.70
+  },
+  "extend": {
+    "accuracy": 0.88,
+    "independence": 0.82,
+    "stability": 0.80,
+    "transfer": 0.68,
+    "confidence": 0.80
+  },
+  "strong_error_hypothesis": 0.70,
+  "block_advance_errors": ["conceptual_error", "missing_prerequisite", "persistent_difficulty"],
+  "recover_preferred_errors": ["missing_prerequisite"],
+  "consolidate_preferred_errors": ["procedure_error", "strategy_selection", "not_automated"],
+  "supported_success_weights": {
+    "none": 1.0,
+    "light_prompt": 0.9,
+    "structured_prompt": 0.72,
+    "worked_support": 0.45,
+    "direct_solution": 0.1
+  },
+  "note": "Default operativi configurabili. Non sono soglie cliniche o psicometriche."
+}
