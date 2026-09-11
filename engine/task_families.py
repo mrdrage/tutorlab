@@ -2,12 +2,31 @@ import hashlib
 import json
 
 from engine.families_english import present_simple_task
+from engine.families_english_year1_grammar_core import GRAMMAR_CORE_BUILDERS
+from engine.families_english_year1_grammar_use import GRAMMAR_USE_BUILDERS
+from engine.families_english_year1_lexis import LEXIS_BUILDERS
+from engine.families_english_year1_productive import PRODUCTIVE_BUILDERS
+from engine.families_english_year1_receptive import RECEPTIVE_BUILDERS
 from engine.families_math import fraction_equivalence_task
+from engine.families_math_year1_geometry import GEOMETRY_DATA_BUILDERS
+from engine.families_math_year1_numbers import NUMBER_BUILDERS
+from engine.families_math_year1_practices import PRACTICE_BUILDERS
 
 REGISTRY = {
     "math.numbers.fraction-equivalence": fraction_equivalence_task,
     "eng.grammar.present_simple": present_simple_task,
 }
+for group in (
+    NUMBER_BUILDERS,
+    GEOMETRY_DATA_BUILDERS,
+    PRACTICE_BUILDERS,
+    GRAMMAR_CORE_BUILDERS,
+    GRAMMAR_USE_BUILDERS,
+    LEXIS_BUILDERS,
+    RECEPTIVE_BUILDERS,
+    PRODUCTIVE_BUILDERS,
+):
+    REGISTRY.update(group)
 
 
 def fingerprint(family_id, params):
