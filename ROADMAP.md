@@ -8,6 +8,7 @@
 - [x] **Motore adattivo: diagnosi, errori e decisione del passo successivo**
 - [x] **Generazione di sessioni didattiche complete e criteri di qualità**
 - [x] **Learning Snapshot + contratto applicativo per futura integrazione Hub Scuola**
+- [x] **Generation Coverage v0.2: intera 1ª media eseguibile per Matematica e Inglese**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
@@ -32,7 +33,10 @@ Non-obiettivi: UI completa, database applicativo, login/account, integrazione di
 - [x] separazione tra contenuto, difficoltà e guida;
 - [x] vincoli anti-ripetizione;
 - [x] quality gate e vertical slice;
-- [ ] ampliare la generation coverage oltre i vertical slice iniziali.
+- [x] generation coverage completa dei nodi di 1ª media per Matematica e Inglese;
+- [x] CI che impedisce regressioni di copertura quando cambia il curriculum di 1ª;
+- [ ] generation coverage di 2ª media;
+- [ ] generation coverage di 3ª media.
 
 ## v0.4 — Adattamento e Learning Snapshot
 
