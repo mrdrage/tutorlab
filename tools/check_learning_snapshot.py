@@ -56,8 +56,10 @@ def main():
     new=[task["fingerprint"] for phase in repeated["session"]["phases"] for task in phase.get("tasks",[])]
     if any(fp in old for fp in new): errors.append("history did not force fresh task fingerprints")
 
-    unsupported=dispatch("math.numbers.signed-number-sense","reassess","math.numbers.signed-number-sense",seed=4)
-    if unsupported["status"]!="needs_review": errors.append("generation capability boundary missing")
+    third_year=dispatch("math.numbers.signed-number-sense","reassess","math.numbers.signed-number-sense",seed=4)
+    if third_year["status"]!="ok": errors.append("third-year curriculum target should now be executable")
+    outside_scope=dispatch("math.future.out-of-scope","reassess","math.future.out-of-scope",seed=4)
+    if outside_scope["status"]!="needs_review": errors.append("out-of-scope capability boundary missing")
 
     eng=english_case(); eplan,esent=build(eng,"english","eng.grammar.present_simple",44)
     if eplan.get("action")!="consolidate" or esent["status"]!="ok": errors.append("english plan should consolidate supported target")
@@ -77,6 +79,7 @@ def main():
     print("Learning snapshot validation: OK")
     print("Math next step:",moved["next_step"])
     print("English action:",eplan["action"])
+    print("Third-year generation status:",third_year["status"])
     return 0
 
 
