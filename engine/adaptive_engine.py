@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from engine.mastery_rubrics import evidence_gate
+
 ACTIONS = {"recover", "consolidate", "advance", "extend", "reassess"}
 
 
@@ -48,23 +50,19 @@ def decide(
     suggested_next_id: str | None = None,
     recovery_depth: int = 0,
 ) -> Decision:
-    """Return a transparent routing decision from a competency state.
-
-    Mastery dimensions may be plain numbers in legacy fixtures or confidence-aware
-    estimates of the form {"value": ..., "confidence": ...}. Unknown dimensions
-    therefore cannot accidentally count as secure evidence.
-    """
+    """Return a transparent routing decision from a competency state."""
 
     confidence = float(target_state.get("confidence", 0.0))
     evidence = target_state.get("evidence_summary", {})
     contradiction = float(evidence.get("contradiction_level", 0.0))
     min_conf = float(policy["min_decision_confidence"])
+    contradiction_threshold = float(policy.get("contradiction_threshold", 0.6))
 
-    if confidence < min_conf or contradiction >= 0.6:
+    if confidence < min_conf or contradiction >= contradiction_threshold:
         return Decision(
             action="reassess",
             confidence=max(0.35, confidence),
-            rationale="Evidenze insufficienti o contraddittorie: serve una prova mirata prima di cambiare percorso.",
+            rationale="Evidenze insufficienti o realmente contraddittorie: serve una prova mirata prima di cambiare percorso.",
         )
 
     hypothesis = _primary_hypothesis(target_state)
@@ -100,25 +98,43 @@ def decide(
     mastery = _mastery_values(target_state.get("mastery", {}), confidence)
     independent = int(evidence.get("independent_event_count", 0))
 
-    if _meets(mastery, policy["extend"]):
+    recovery_exit = policy.get("recovery_exit")
+    if recovery_depth > 0 and recovery_exit:
+        min_recovery_independent = int(policy.get("min_independent_for_recovery_exit", 1))
+        if independent >= min_recovery_independent and _meets(mastery, recovery_exit):
+            return Decision(
+                action="advance",
+                confidence=confidence,
+                rationale="Il prerequisito recuperato soddisfa il criterio di uscita dal recupero; si torna all'obiettivo sospeso per una rivalutazione.",
+                next_competency_id=suggested_next_id,
+            )
+
+    extend_gate = evidence_gate(current_target_id, evidence, for_extension=True)
+    if _meets(mastery, policy["extend"]) and extend_gate["ready"]:
         return Decision(
             action="extend",
             confidence=confidence,
-            rationale="La competenza è accurata, autonoma, stabile e trasferibile: è appropriato aumentare apertura e profondità.",
+            rationale=f"La competenza è accurata, autonoma, stabile e trasferibile con evidenze sufficienti per la famiglia {extend_gate['family']}.",
             next_competency_id=current_target_id,
         )
 
-    if independent >= int(policy["min_independent_for_advance"]) and _meets(mastery, policy["advance"]):
+    advance_gate = evidence_gate(current_target_id, evidence)
+    if (
+        independent >= int(policy["min_independent_for_advance"])
+        and _meets(mastery, policy["advance"])
+        and advance_gate["ready"]
+    ):
         return Decision(
             action="advance",
             confidence=confidence,
-            rationale="Le evidenze autonome e multidimensionali sono sufficienti per tentare il nodo successivo.",
+            rationale=f"Le evidenze autonome e multidimensionali sono sufficienti per avanzare nella famiglia {advance_gate['family']}.",
             next_competency_id=suggested_next_id,
         )
 
+    missing = ", ".join(advance_gate["missing"]) if advance_gate["missing"] else "soglie di padronanza"
     return Decision(
         action="consolidate",
         confidence=confidence,
-        rationale="La competenza mostra basi utili ma non soddisfa ancora i criteri di autonomia, stabilità e trasferimento per avanzare.",
+        rationale=f"La competenza mostra basi utili ma non soddisfa ancora i criteri per avanzare: {missing}.",
         next_competency_id=current_target_id,
     )
