@@ -7,7 +7,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from engine.adaptive_engine import decide
+from engine.diagnostic_planner import plan_reassessment
 from engine.evidence_model import aggregate_competency_state
+from engine.objective_stack import complete_current, current_objective, push_recovery, recovery_depth, start_objective
 
 
 def load(path):
@@ -56,6 +58,30 @@ def main():
     if state["mastery"]["fluency"]["confidence"] != 0.0:
         errors.append("dimensione non osservata con confidenza non nulla")
 
+    diagnostic = plan_reassessment(state, target_competency_id="math.numbers.proportions")
+    if not any(probe["competency_id"] == "math.numbers.ratios" for probe in diagnostic["probes"]):
+        errors.append("diagnostic planner non verifica il prerequisito sospetto")
+
+    stack = start_objective("math.numbers.proportions")
+    stack = push_recovery(stack, "math.numbers.ratios", reason="missing prerequisite", max_depth=2)
+    stack = push_recovery(stack, "math.numbers.fraction-equivalence", reason="ratio representation unstable", max_depth=2)
+    if recovery_depth(stack) != 2 or current_objective(stack) != "math.numbers.fraction-equivalence":
+        errors.append("objective stack non mantiene la profondità di recupero")
+    stack = complete_current(stack)
+    if current_objective(stack) != "math.numbers.ratios":
+        errors.append("objective stack non ritorna al recupero sospeso")
+    stack = complete_current(stack)
+    if current_objective(stack) != "math.numbers.proportions":
+        errors.append("objective stack non ritorna al target originario")
+
+    try:
+        stack = push_recovery(stack, "a", reason="test", max_depth=2)
+        stack = push_recovery(stack, "b", reason="test", max_depth=2)
+        push_recovery(stack, "c", reason="test", max_depth=2)
+        errors.append("objective stack consente una profondità oltre il limite")
+    except ValueError:
+        pass
+
     if errors:
         print("Adaptive engine validation: FAILED")
         for error in errors:
@@ -63,6 +89,10 @@ def main():
         return 1
 
     print("Adaptive engine validation: OK")
+    print(f"Routing scenarios: {len(suite['scenarios'])}")
+    print("Evidence pipeline: OK")
+    print("Diagnostic planner: OK")
+    print("Objective stack: OK")
     return 0
 
 
