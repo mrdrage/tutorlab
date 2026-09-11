@@ -1,0 +1,123 @@
+{
+  "version": "0.1",
+  "scenarios": [
+    {
+      "id": "math-proportions-missing-ratios",
+      "target": "math.numbers.proportions",
+      "next": "math.numbers.percentages",
+      "recovery_depth": 0,
+      "expected": "recover",
+      "expected_recovery": "math.numbers.ratios",
+      "state": {
+        "confidence": 0.82,
+        "mastery": {"accuracy": 0.52, "independence": 0.48, "stability": 0.45, "transfer": 0.25, "explanation": 0.4, "fluency": 0.55},
+        "evidence_summary": {"event_count": 6, "independent_event_count": 4, "transfer_event_count": 2, "contradiction_level": 0.12},
+        "error_hypotheses": [{"code": "missing_prerequisite", "confidence": 0.79, "persistence": "repeated", "related_competency_id": "math.numbers.ratios", "evidence_for": ["e1", "e2"], "evidence_against": []}]
+      }
+    },
+    {
+      "id": "english-present-simple-guided-only",
+      "target": "eng.grammar.present_simple",
+      "next": "eng.grammar.basic_questions",
+      "recovery_depth": 0,
+      "expected": "consolidate",
+      "state": {
+        "confidence": 0.76,
+        "mastery": {"accuracy": 0.84, "independence": 0.46, "stability": 0.64, "transfer": 0.31, "explanation": 0.58, "fluency": 0.55},
+        "evidence_summary": {"event_count": 7, "independent_event_count": 1, "transfer_event_count": 1, "contradiction_level": 0.1},
+        "error_hypotheses": [{"code": "not_automated", "confidence": 0.58, "persistence": "repeated", "evidence_for": ["e3"], "evidence_against": ["e4"]}]
+      }
+    },
+    {
+      "id": "math-fractions-secure-advance",
+      "target": "math.numbers.fraction-equivalence",
+      "next": "math.numbers.fraction-comparison",
+      "recovery_depth": 0,
+      "expected": "advance",
+      "state": {
+        "confidence": 0.82,
+        "mastery": {"accuracy": 0.86, "independence": 0.82, "stability": 0.78, "transfer": 0.56, "explanation": 0.7, "fluency": 0.7},
+        "evidence_summary": {"event_count": 6, "independent_event_count": 4, "transfer_event_count": 1, "contradiction_level": 0.08},
+        "error_hypotheses": []
+      }
+    },
+    {
+      "id": "english-reading-a2-extend",
+      "target": "eng.reading.a2_everyday_texts",
+      "next": null,
+      "recovery_depth": 0,
+      "expected": "extend",
+      "state": {
+        "confidence": 0.9,
+        "mastery": {"accuracy": 0.94, "independence": 0.9, "stability": 0.86, "transfer": 0.75, "explanation": 0.7, "fluency": 0.78},
+        "evidence_summary": {"event_count": 10, "independent_event_count": 8, "transfer_event_count": 3, "contradiction_level": 0.05},
+        "error_hypotheses": []
+      }
+    },
+    {
+      "id": "insufficient-evidence-reassess",
+      "target": "math.geometry.pythagoras",
+      "next": "math.geometry.euclid-theorems",
+      "recovery_depth": 0,
+      "expected": "reassess",
+      "state": {
+        "confidence": 0.41,
+        "mastery": {"accuracy": 0.8, "independence": 0.8, "stability": 0.4, "transfer": 0.0, "explanation": 0.5, "fluency": 0.6},
+        "evidence_summary": {"event_count": 1, "independent_event_count": 1, "transfer_event_count": 0, "contradiction_level": 0.0},
+        "error_hypotheses": []
+      }
+    },
+    {
+      "id": "contradictory-evidence-reassess",
+      "target": "eng.listening.a2_conversations",
+      "next": "eng.listening.a2_exam_strategies",
+      "recovery_depth": 0,
+      "expected": "reassess",
+      "state": {
+        "confidence": 0.78,
+        "mastery": {"accuracy": 0.72, "independence": 0.7, "stability": 0.35, "transfer": 0.45, "explanation": 0.5, "fluency": 0.5},
+        "evidence_summary": {"event_count": 7, "independent_event_count": 5, "transfer_event_count": 2, "contradiction_level": 0.72},
+        "error_hypotheses": []
+      }
+    },
+    {
+      "id": "conceptual-error-blocks-advance",
+      "target": "math.geometry.area-concept",
+      "next": "math.geometry.areas-polygons",
+      "recovery_depth": 0,
+      "expected": "consolidate",
+      "state": {
+        "confidence": 0.84,
+        "mastery": {"accuracy": 0.8, "independence": 0.76, "stability": 0.72, "transfer": 0.52, "explanation": 0.42, "fluency": 0.75},
+        "evidence_summary": {"event_count": 8, "independent_event_count": 5, "transfer_event_count": 2, "contradiction_level": 0.15},
+        "error_hypotheses": [{"code": "conceptual_error", "confidence": 0.76, "persistence": "repeated", "evidence_for": ["confuses area and perimeter"], "evidence_against": []}]
+      }
+    },
+    {
+      "id": "recovery-depth-guard",
+      "target": "math.relations.first-degree-equations",
+      "next": null,
+      "recovery_depth": 2,
+      "expected": "reassess",
+      "state": {
+        "confidence": 0.86,
+        "mastery": {"accuracy": 0.35, "independence": 0.3, "stability": 0.3, "transfer": 0.1, "explanation": 0.3, "fluency": 0.3},
+        "evidence_summary": {"event_count": 8, "independent_event_count": 5, "transfer_event_count": 1, "contradiction_level": 0.1},
+        "error_hypotheses": [{"code": "missing_prerequisite", "confidence": 0.81, "persistence": "persistent", "related_competency_id": "math.numbers.fraction-operations", "evidence_for": ["e7", "e8"], "evidence_against": []}]
+      }
+    },
+    {
+      "id": "isolated-attention-lapse-does-not-demote",
+      "target": "math.numbers.signed-operations",
+      "next": "math.relations.algebraic-expressions",
+      "recovery_depth": 0,
+      "expected": "advance",
+      "state": {
+        "confidence": 0.85,
+        "mastery": {"accuracy": 0.84, "independence": 0.82, "stability": 0.8, "transfer": 0.58, "explanation": 0.68, "fluency": 0.72},
+        "evidence_summary": {"event_count": 9, "independent_event_count": 7, "transfer_event_count": 2, "contradiction_level": 0.12},
+        "error_hypotheses": [{"code": "attention_lapse", "confidence": 0.74, "persistence": "single", "evidence_for": ["single sign transcription"], "evidence_against": ["seven stable independent events"]}]
+      }
+    }
+  ]
+}
