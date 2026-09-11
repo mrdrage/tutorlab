@@ -1,12 +1,14 @@
-name: Curriculum validation
+name: TutorLab validation
 
 on:
   pull_request:
     paths:
       - 'curriculum/**'
       - 'schemas/**'
+      - 'engine/**'
+      - 'config/**'
       - 'tools/**'
-      - 'tests/curriculum/**'
+      - 'tests/**'
       - '.github/workflows/curriculum-validation.yml'
   push:
     branches:
@@ -14,8 +16,10 @@ on:
     paths:
       - 'curriculum/**'
       - 'schemas/**'
+      - 'engine/**'
+      - 'config/**'
       - 'tools/**'
-      - 'tests/curriculum/**'
+      - 'tests/**'
 
 jobs:
   validate:
@@ -29,3 +33,5 @@ jobs:
         run: python3 tools/validate_curriculum.py
       - name: Validate English curriculum
         run: python3 tools/check_english_curriculum.py
+      - name: Validate adaptive engine
+        run: python3 tools/check_adaptive_engine.py
