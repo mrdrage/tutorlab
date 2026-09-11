@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from engine.session_engine import build_session, load_policy, student_view
 from engine.session_quality import validate_session
-from engine.task_families import supported_competencies
+from engine.task_families import build_unique_task, supported_competencies
 
 ACTIONS = ("recover", "consolidate", "advance", "extend", "reassess")
 SUBJECTS = {
@@ -20,19 +20,19 @@ SUBJECTS = {
 }
 REQUIRED_NODE = {"id", "title", "strand", "typical_year", "priority", "prerequisites", "objectives", "mastery_evidence"}
 REQUIRED_TASK = {"task_id", "family_id", "prompt", "response_mode", "challenge_band", "support_level", "solution", "rubric", "evidence_dimensions", "generation_parameters", "fingerprint", "competency_id"}
+RESOURCE_STRANDS = {"grammar", "vocabulary", "phonology"}
 
 
 def load_subject(subject: str):
     base = ROOT / "curriculum" / "middle-school" / subject
-    rows = []
     for year in (1, 2, 3):
         data = json.loads((base / f"year-{year}.json").read_text(encoding="utf-8"))
         yield year, data
-        rows.extend(data.get("nodes", []))
 
 
 def has_cycle(nodes: list[dict]) -> bool:
-    graph = {node["id"]: [p for p in node.get("prerequisites", []) if p in {n["id"] for n in nodes}] for node in nodes}
+    ids = {node["id"] for node in nodes}
+    graph = {node["id"]: [p for p in node.get("prerequisites", []) if p in ids] for node in nodes}
     visiting = set()
     visited = set()
 
@@ -95,6 +95,7 @@ def main() -> int:
             failures.append(f"{subject}: {len(nodes)} nodes != expected {config['expected']}")
 
         all_ids = {node["id"] for node in nodes}
+        node_index = {node["id"]: node for node in nodes}
         for node in nodes:
             for prerequisite in node.get("prerequisites", []):
                 if prerequisite not in all_ids:
@@ -107,6 +108,8 @@ def main() -> int:
             failures.append(f"{subject}: uncovered generation nodes: {missing_registry}")
 
         for index, competency_id in enumerate(sorted(all_ids), 1):
+            node = node_index[competency_id]
+            advance_session = None
             for offset, action in enumerate(ACTIONS, 1):
                 variants += 1
                 try:
@@ -120,6 +123,9 @@ def main() -> int:
                 except Exception as exc:
                     failures.append(f"{competency_id}/{action}: build failed: {exc}")
                     continue
+
+                if action == "advance":
+                    advance_session = session
 
                 quality_errors = validate_session(session, policy)
                 if quality_errors:
@@ -143,6 +149,41 @@ def main() -> int:
                         if leaked:
                             failures.append(f"{competency_id}/{action}: student view leaks {leaked}")
 
+            # Semantic quality gate: a worked example must actually contain an explicit model.
+            if advance_session:
+                worked = [p for p in advance_session.get("phases", []) if p.get("kind") == "worked_example"]
+                if not worked or not worked[0].get("tasks"):
+                    failures.append(f"{competency_id}: missing worked-example task")
+                else:
+                    prompt = worked[0]["tasks"][0].get("prompt", "").lower()
+                    if "modello" not in prompt:
+                        failures.append(f"{competency_id}: worked example does not expose a model")
+
+                if node.get("strand") == "listening":
+                    tutor_tasks = [
+                        item
+                        for phase in advance_session.get("phases", [])
+                        for item in phase.get("tasks", [])
+                        if item.get("family_id", "").endswith(".listening")
+                    ]
+                    if not tutor_tasks or not any(item.get("solution", {}).get("tutor_script") for item in tutor_tasks):
+                        failures.append(f"{competency_id}: listening task lacks tutor-only script")
+
+            # Language resources must use concrete material, not only a generic instruction.
+            if node.get("strand") in RESOURCE_STRANDS:
+                item = build_unique_task(competency_id, "independent_practice", 71_001, 3, "none", "resource-check", [], 12)
+                sample = item.get("generation_parameters", {}).get("sample")
+                if not sample or sample not in item.get("prompt", ""):
+                    failures.append(f"{competency_id}: language-resource task lacks concrete sample")
+
+            # Anti-repeat headroom: representative seeds must not collapse to one or two fingerprints.
+            fingerprints = {
+                build_unique_task(competency_id, "independent_practice", 80_000 + seed, 3, "none", "diversity-check", [], 12)["fingerprint"]
+                for seed in range(1, 9)
+            }
+            if len(fingerprints) < 3:
+                failures.append(f"{competency_id}: generation diversity too low ({len(fingerprints)}/8 fingerprints)")
+
     if failures:
         print("Language Expansion validation: FAILED")
         for failure in failures:
@@ -155,6 +196,10 @@ def main() -> int:
     print(f"Spanish nodes: {totals['spanish']}")
     print(f"Total new executable nodes: {sum(totals.values())}")
     print(f"Adaptive session variants exercised: {variants}")
+    print("Semantic worked-example checks: OK")
+    print("Concrete language-resource checks: OK")
+    print("Generation diversity checks: OK")
+    print("Listening tutor-script isolation: OK")
     print("GitHub Actions/workflows: absent")
     return 0
 
