@@ -9,6 +9,7 @@
 - [x] **Generazione di sessioni didattiche complete e criteri di qualità**
 - [x] **Learning Snapshot + contratto applicativo per futura integrazione Hub Scuola**
 - [x] **Generation Coverage v0.2: intera 1ª media eseguibile per Matematica e Inglese**
+- [x] **Generation Coverage v0.3: intera 2ª media eseguibile per Matematica e Inglese**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
@@ -35,7 +36,8 @@ Non-obiettivi: UI completa, database applicativo, login/account, integrazione di
 - [x] quality gate e vertical slice;
 - [x] generation coverage completa dei nodi di 1ª media per Matematica e Inglese;
 - [x] CI che impedisce regressioni di copertura quando cambia il curriculum di 1ª;
-- [ ] generation coverage di 2ª media;
+- [x] generation coverage completa dei nodi di 2ª media per Matematica e Inglese;
+- [x] CI che impedisce regressioni di copertura quando cambia il curriculum di 2ª;
 - [ ] generation coverage di 3ª media.
 
 ## v0.4 — Adattamento e Learning Snapshot
