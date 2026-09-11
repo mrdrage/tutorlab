@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 import json
+import sys
 from pathlib import Path
+
+ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT))
 
 from engine.adaptive_engine import decide
 from engine.evidence_model import aggregate_competency_state
 from engine.session_engine import build_session
 from engine.session_evaluator import results_to_evidence
 
-ROOT=Path(__file__).resolve().parents[2]
 ADAPTIVE=json.loads((ROOT/"config/adaptive-policy.json").read_text(encoding="utf-8"))
 
 
