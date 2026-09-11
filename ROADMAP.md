@@ -7,63 +7,44 @@
 - [x] **Curriculum Inglese 1ª-3ª media + progressione A1-A2**
 - [x] **Motore adattivo: diagnosi, errori e decisione del passo successivo**
 - [x] **Generazione di sessioni didattiche complete e criteri di qualità**
-- [ ] **Profili studente e contratto futuro con Hub Scuola**
+- [x] **Learning Snapshot + contratto applicativo per futura integrazione Hub Scuola**
 
-I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco viene considerato completato solo quando produce un sottosistema coerente, documentato e verificabile.
+I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
 ## v0.1 — Fondazioni
 
-Obiettivo: dimostrare che TutorLab possiede un metodo didattico coerente e rappresentabile in dati strutturati.
+Obiettivo: dimostrare un circuito didattico coerente, eseguibile e rappresentabile in dati strutturati.
 
-Deliverable:
+Completato: pedagogia comune, Difficulty Engine, curriculum Matematica e Inglese, grafi dei prerequisiti, Adaptive Engine, Session Engine, vertical slice, evidence events, objective stack, Learning Snapshot, target selection, capability boundary e CI.
 
-- manifesto e visione;
-- pedagogia comune;
-- tassonomia degli errori;
-- schema formale di una competenza;
-- modello dei livelli di difficoltà;
-- curriculum iniziale 1ª-3ª media per Matematica;
-- curriculum iniziale 1ª-3ª media per Inglese;
-- un vertical slice completo di Matematica;
-- un vertical slice completo di Inglese;
-- formato delle sessioni e dei risultati;
-- criteri di recupero, consolidamento, avanzamento e potenziamento;
-- esempi con studenti fittizi;
-- test qualitativi sulla generazione.
-
-Non-obiettivi:
-
-- UI completa;
-- database di studenti;
-- integrazione diretta con Hub Scuola;
-- login/account;
-- generazione massiva di PDF;
-- riproduzione di manuali protetti da copyright.
+Non-obiettivi: UI completa, database applicativo, login/account, integrazione diretta con Hub Scuola, generazione massiva di PDF e riproduzione di manuali protetti da copyright.
 
 ## v0.2 — Curriculum e prerequisiti
 
-- completare il grafo delle competenze di matematica;
-- completare il grafo delle competenze di inglese;
-- introdurre fonti curricolari versionate e data di revisione;
-- formalizzare relazioni tra prerequisito, obiettivo e competenze successive;
-- introdurre rubriche di padronanza per famiglie di competenze.
+- [x] grafi Matematica e Inglese;
+- [x] fonti curricolari versionate;
+- [x] relazioni prerequisito-obiettivo-successore;
+- [ ] rubriche di padronanza più ricche per famiglie di competenze.
 
 ## v0.3 — Generazione controllata
 
-- [x] definire famiglie di esercizi parametrizzate;
-- [x] separare contenuto, difficoltà e grado di guida;
-- [x] introdurre vincoli anti-ripetizione;
-- [x] generare esempi, pratica, verifica e recupero dallo stesso nodo di competenza;
-- [x] testare coerenza delle soluzioni e appropriatezza per classe sui vertical slice iniziali.
+- [x] famiglie di esercizi parametrizzate;
+- [x] separazione tra contenuto, difficoltà e guida;
+- [x] vincoli anti-ripetizione;
+- [x] quality gate e vertical slice;
+- [ ] ampliare la generation coverage oltre i vertical slice iniziali.
 
-## v0.4 — Adattamento
+## v0.4 — Adattamento e Learning Snapshot
 
-- [x] modello di sessione;
-- [x] modello di risultato;
-- [x] storico sintetico delle evidenze;
-- [x] decision engine iniziale;
-- [x] scelta tra recover, consolidate, advance, extend e reassess;
-- [x] simulazioni con profili fittizi longitudinali iniziali.
+- [x] modello di sessione e risultato;
+- [x] evidence events e stato di competenza;
+- [x] decision engine;
+- [x] objective stack;
+- [x] target selector;
+- [x] capability boundary curriculum/generazione;
+- [x] Learning Snapshot;
+- [x] contratto applicativo Plan / Transition;
+- [x] fixture sintetiche e CI.
 
 ## v0.5 — Nuove materie
 
@@ -84,19 +65,11 @@ Obiettivo: verificare che l'architettura sia realmente multidisciplinare.
 
 ## v0.7 — Integrazione Hub Scuola
 
-- contratto dati stabile tra Hub Scuola e TutorLab;
-- importazione di un profilo didattico pseudonimizzato/locale;
-- restituzione di attività, evidenze e prossimo obiettivo;
-- nessuna dipendenza di TutorLab dalla UI di Hub Scuola.
+- adapter tra storage Hub Scuola e Learning Snapshot;
+- uso del contratto Plan / Transition senza accoppiare le UI;
+- persistenza di attività, evidenze e prossimo obiettivo lato applicazione;
+- TutorLab indipendente dal database di Hub Scuola.
 
 ## v1.0 — TutorLab stabile
 
-TutorLab 1.0 deve poter:
-
-1. ricevere un profilo didattico;
-2. scegliere un obiettivo coerente;
-3. verificare prerequisiti;
-4. costruire una sessione completa;
-5. interpretare i risultati;
-6. proporre il passo successivo;
-7. motivare la propria decisione didattica in modo verificabile dal tutor.
+TutorLab 1.0 deve poter ricevere uno stato didattico, scegliere un obiettivo coerente, verificare prerequisiti, costruire una sessione, interpretare i risultati, proporre il passo successivo e motivare ogni decisione in modo verificabile dal tutor.

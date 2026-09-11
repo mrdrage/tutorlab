@@ -4,15 +4,27 @@ import json
 from engine.families_english import present_simple_task
 from engine.families_math import fraction_equivalence_task
 
+REGISTRY = {
+    "math.numbers.fraction-equivalence": fraction_equivalence_task,
+    "eng.grammar.present_simple": present_simple_task,
+}
+
 
 def fingerprint(family_id, params):
     payload=json.dumps({"family_id":family_id,"params":params},sort_keys=True,ensure_ascii=False,separators=(",",":"))
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:20]
 
 
+def supported_competencies():
+    return set(REGISTRY)
+
+
+def can_generate(competency_id):
+    return competency_id in REGISTRY
+
+
 def _builder(competency_id):
-    if competency_id=="math.numbers.fraction-equivalence": return fraction_equivalence_task
-    if competency_id=="eng.grammar.present_simple": return present_simple_task
+    if competency_id in REGISTRY: return REGISTRY[competency_id]
     raise ValueError(f"no task family registry for {competency_id}")
 
 
