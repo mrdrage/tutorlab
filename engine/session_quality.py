@@ -27,7 +27,7 @@ def validate_session(session,policy):
                 if task.get("support_level")!="none": errors.append("reassess task uses scaffold")
     if action=="recover" and (not kinds or kinds[-1]!="reassessment"): errors.append("recover does not end with reassessment")
     if action=="advance" and "independent_practice" not in kinds: errors.append("advance lacks independent practice")
-    if action in {"advance","consolidate","extend"} and "transfer" not in kinds: errors.append("instructional session lacks transfer")
+    if action in {"recover","advance","consolidate","extend"} and "transfer" not in kinds: errors.append("instructional session lacks transfer")
 
     sv=student_view(session)
     for phase in sv.get("phases",[]):
