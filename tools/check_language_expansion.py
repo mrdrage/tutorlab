@@ -8,6 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from engine.objective_stack import start_objective
+from engine.result_transition import transition
 from engine.session_engine import build_session, load_policy, student_view
 from engine.session_quality import validate_session
 from engine.task_families import build_unique_task, supported_competencies
@@ -17,6 +19,11 @@ SUBJECTS = {
     "italian": {"prefix": "ita.", "expected": 45, "cefr": None},
     "french": {"prefix": "fr.", "expected": 46, "cefr": "A1"},
     "spanish": {"prefix": "es.", "expected": 46, "cefr": "A1"},
+}
+PIPELINE_TARGETS = {
+    "italian": "ita.grammar.orthography-punctuation",
+    "french": "fr.grammar.identity-possession",
+    "spanish": "es.grammar.identity-possession",
 }
 REQUIRED_NODE = {"id", "title", "strand", "typical_year", "priority", "prerequisites", "objectives", "mastery_evidence"}
 REQUIRED_TASK = {"task_id", "family_id", "prompt", "response_mode", "challenge_band", "support_level", "solution", "rubric", "evidence_dimensions", "generation_parameters", "fingerprint", "competency_id"}
@@ -52,10 +59,77 @@ def has_cycle(nodes: list[dict]) -> bool:
     return any(visit(node_id) for node_id in graph if node_id not in visited)
 
 
+def _synthetic_snapshot(subject: str, target: str) -> dict:
+    return {
+        "version": "0.1",
+        "subjects": {
+            subject: {
+                "typical_year": 1,
+                "competency_states": {},
+                "evidence_events": [],
+                "objective_stack": start_objective(target),
+                "last_recommendation": None,
+            }
+        },
+        "recent_activity": {"session_ids": [], "fingerprints": []},
+        "preferences": {},
+    }
+
+
+def _scored_result(session: dict) -> dict:
+    responses = []
+    for phase in session.get("phases", []):
+        for item in phase.get("tasks", []):
+            row = {
+                "task_id": item["task_id"],
+                "response": "synthetic scored response",
+                "status": "correct",
+                "score": 1.0,
+                "support_used": item.get("support_level", "none"),
+                "explanation_quality": 0.85,
+            }
+            if phase.get("kind") in {"transfer", "transfer_probe", "challenge"}:
+                row["transfer_success"] = 0.9
+            responses.append(row)
+    return {
+        "version": "0.1",
+        "session_id": session["session_id"],
+        "completed_at": "2026-09-11T22:30:00+02:00",
+        "completion_status": "completed",
+        "responses": responses,
+    }
+
+
+def _check_pipeline(subject: str, target: str, adaptive_policy: dict, session_policy: dict) -> list[str]:
+    failures = []
+    snapshot = _synthetic_snapshot(subject, target)
+    session = build_session(target, "consolidate", original_target_id=target, seed=91_000, challenge_band=2, policy=session_policy)
+    moved = transition(snapshot, subject, session, _scored_result(session), adaptive_policy)
+    updated = moved.get("snapshot_update", {})
+    subject_state = updated.get("subjects", {}).get(subject, {})
+    events = moved.get("evidence_events", [])
+
+    if not events:
+        failures.append(f"{subject}: session results did not become evidence events")
+    if moved.get("pending_task_ids"):
+        failures.append(f"{subject}: explicitly scored synthetic responses unexpectedly remained pending")
+    if target not in subject_state.get("competency_states", {}):
+        failures.append(f"{subject}: competency state not updated after evidence")
+    if session["session_id"] not in updated.get("recent_activity", {}).get("session_ids", []):
+        failures.append(f"{subject}: session history not updated")
+    if not updated.get("recent_activity", {}).get("fingerprints", []):
+        failures.append(f"{subject}: fingerprint history not updated")
+    next_step = moved.get("next_step", {})
+    if next_step.get("action") not in {"recover", "consolidate", "advance", "extend", "reassess", "return_to"}:
+        failures.append(f"{subject}: invalid next-step action after transition: {next_step}")
+    return failures
+
+
 def main() -> int:
     failures = []
     registry = supported_competencies()
-    policy = load_policy()
+    session_policy = load_policy()
+    adaptive_policy = json.loads((ROOT / "config" / "adaptive-policy.json").read_text(encoding="utf-8"))
     totals = {}
     variants = 0
 
@@ -118,7 +192,7 @@ def main() -> int:
                         action,
                         seed=60_000 + index * 10 + offset,
                         challenge_band=3,
-                        policy=policy,
+                        policy=session_policy,
                     )
                 except Exception as exc:
                     failures.append(f"{competency_id}/{action}: build failed: {exc}")
@@ -127,7 +201,7 @@ def main() -> int:
                 if action == "advance":
                     advance_session = session
 
-                quality_errors = validate_session(session, policy)
+                quality_errors = validate_session(session, session_policy)
                 if quality_errors:
                     failures.append(f"{competency_id}/{action}: quality errors: {quality_errors}")
 
@@ -149,7 +223,6 @@ def main() -> int:
                         if leaked:
                             failures.append(f"{competency_id}/{action}: student view leaks {leaked}")
 
-            # Semantic quality gate: a worked example must actually contain an explicit model.
             if advance_session:
                 worked = [p for p in advance_session.get("phases", []) if p.get("kind") == "worked_example"]
                 if not worked or not worked[0].get("tasks"):
@@ -169,20 +242,21 @@ def main() -> int:
                     if not tutor_tasks or not any(item.get("solution", {}).get("tutor_script") for item in tutor_tasks):
                         failures.append(f"{competency_id}: listening task lacks tutor-only script")
 
-            # Language resources must use concrete material, not only a generic instruction.
             if node.get("strand") in RESOURCE_STRANDS:
                 item = build_unique_task(competency_id, "independent_practice", 71_001, 3, "none", "resource-check", [], 12)
                 sample = item.get("generation_parameters", {}).get("sample")
                 if not sample or sample not in item.get("prompt", ""):
                     failures.append(f"{competency_id}: language-resource task lacks concrete sample")
 
-            # Anti-repeat headroom: representative seeds must not collapse to one or two fingerprints.
             fingerprints = {
                 build_unique_task(competency_id, "independent_practice", 80_000 + seed, 3, "none", "diversity-check", [], 12)["fingerprint"]
                 for seed in range(1, 9)
             }
             if len(fingerprints) < 3:
                 failures.append(f"{competency_id}: generation diversity too low ({len(fingerprints)}/8 fingerprints)")
+
+    for subject, target in PIPELINE_TARGETS.items():
+        failures.extend(_check_pipeline(subject, target, adaptive_policy, session_policy))
 
     if failures:
         print("Language Expansion validation: FAILED")
@@ -200,6 +274,7 @@ def main() -> int:
     print("Concrete language-resource checks: OK")
     print("Generation diversity checks: OK")
     print("Listening tutor-script isolation: OK")
+    print("Language end-to-end transitions: OK")
     print("GitHub Actions/workflows: absent")
     return 0
 
