@@ -1,0 +1,77 @@
+{
+  "version": "0.1.0",
+  "subject": "english",
+  "purpose": "Gateway verticali ad alto impatto. Le dipendenze complete restano nei prerequisite dei singoli nodi.",
+  "gateway_links": [
+    {
+      "from": "eng.grammar.be",
+      "to": ["eng.grammar.basic_questions", "eng.grammar.present_continuous", "eng.grammar.past_be"],
+      "recovery_rule": "Recuperare funzione e ordine della frase con be prima di aggiungere nuove costruzioni."
+    },
+    {
+      "from": "eng.grammar.present_simple",
+      "to": ["eng.grammar.basic_questions", "eng.interaction.routine_exchanges", "eng.grammar.past_regular"],
+      "recovery_rule": "Separare morfologia della terza persona, uso di do/does e scelta del tempo."
+    },
+    {
+      "from": "eng.grammar.basic_questions",
+      "to": ["eng.interaction.introductions_personal_info", "eng.interaction.travel_directions", "eng.interaction.services_travel"],
+      "recovery_rule": "Se lo studente sa rispondere ma non chiedere, recuperare la domanda dentro uno scambio reale."
+    },
+    {
+      "from": "eng.learning.repair_clarify",
+      "to": ["eng.interaction.introductions_personal_info", "eng.mediation.collaborative_task", "eng.learning.paraphrase_compensation"],
+      "recovery_rule": "Verificare le strategie di riparazione prima di attribuire ogni interruzione a una lacuna grammaticale."
+    },
+    {
+      "from": "eng.reading.short_personal_texts",
+      "to": ["eng.reading.everyday_multitext", "eng.reading.simple_narratives_biographies"],
+      "recovery_rule": "Diagnosticare separatamente lessico, comprensione di frase e strategia gist/detail."
+    },
+    {
+      "from": "eng.listening.personal_information",
+      "to": ["eng.learning.gist_detail_notes", "eng.listening.simple_narratives", "eng.listening.announcements_directions"],
+      "recovery_rule": "Separare riconoscimento fonologico, lessico e strategia di ascolto."
+    },
+    {
+      "from": "eng.grammar.past_irregular",
+      "to": ["eng.production.past_event", "eng.writing.simple_narrative", "eng.grammar.present_perfect_experience"],
+      "recovery_rule": "Distinguere recupero della forma, riconoscimento nell'input e uso narrativo."
+    },
+    {
+      "from": "eng.grammar.going_to",
+      "to": ["eng.interaction.invitations_arrangements", "eng.production.compare_plans", "eng.grammar.will_future"],
+      "recovery_rule": "Se la forma è nota ma la pianificazione fallisce, lavorare sulla funzione comunicativa."
+    },
+    {
+      "from": "eng.learning.gist_detail_notes",
+      "to": ["eng.reading.a2_everyday_texts", "eng.listening.a2_conversations", "eng.reading.a2_exam_strategies", "eng.listening.a2_exam_strategies"],
+      "recovery_rule": "Allenare lo scopo della lettura o dell'ascolto prima di aumentare la difficoltà del testo."
+    },
+    {
+      "from": "eng.writing.personal_paragraph",
+      "to": ["eng.writing.informal_email", "eng.writing.simple_narrative", "eng.writing.a2_email"],
+      "recovery_rule": "Se il testo è frammentato, recuperare organizzazione e coesione prima della correzione locale."
+    },
+    {
+      "from": "eng.mediation.relay_simple_information",
+      "to": ["eng.mediation.summarise_simple_points", "eng.mediation.relay_specific_information"],
+      "recovery_rule": "Allenare la selezione dell'informazione utile, non la riproduzione completa del testo."
+    },
+    {
+      "from": "eng.interaction.opinions_agreement",
+      "to": ["eng.interaction.problem_solving_planning", "eng.writing.opinion_text", "eng.mediation.collaborative_meaning"],
+      "recovery_rule": "Consolidare reazione all'interlocutore e breve motivazione prima di compiti collaborativi più complessi."
+    },
+    {
+      "from": "eng.learning.paraphrase_compensation",
+      "to": ["eng.interaction.services_travel", "eng.mediation.collaborative_meaning"],
+      "recovery_rule": "Allenare descrizione ed esempio quando una parola mancante interrompe la comunicazione."
+    },
+    {
+      "from": "eng.grammar.connectors_cohesion",
+      "to": ["eng.production.experience_future_opinion", "eng.writing.a2_email", "eng.writing.a2_narrative", "eng.writing.opinion_text"],
+      "recovery_rule": "Se la produzione è una lista di frasi, lavorare sulla relazione logica tra le idee."
+    }
+  ]
+}
