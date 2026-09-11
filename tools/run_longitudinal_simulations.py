@@ -19,6 +19,7 @@ def main() -> int:
     metrics = report["metrics"]
     checks = {
         "no systematic premature advancement": metrics["premature_advance_per_run"] <= 0.02,
+        "false recovery remains rare": metrics["false_recovery_per_run"] <= 0.05,
         "no reassessment loops": metrics["reassess_loop_per_run"] <= 0.02,
         "prerequisite gaps detected": metrics["recovery_detect_rate"] >= 0.90,
         "recovery returns to suspended target": metrics["recovery_return_rate"] >= 0.90,
