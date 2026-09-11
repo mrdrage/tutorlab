@@ -1,0 +1,32 @@
+{
+  "example_id": "english-present-simple-consolidate-v0.1",
+  "student": "fictional-student-B",
+  "subject": "english",
+  "target_competency_id": "eng.grammar.present_simple",
+  "observations_summary": [
+    "Completa correttamente la maggior parte delle frasi quando è presente un modello.",
+    "Ha bisogno di prompt per scegliere do/does nelle domande.",
+    "In una breve conversazione sulla routine rallenta molto e torna alla forma base alla terza persona.",
+    "Comprende il Present Simple in un testo breve meglio di quanto riesca a produrlo spontaneamente."
+  ],
+  "inference": {
+    "primary_hypothesis": "not_automated",
+    "confidence": 0.58,
+    "interpretation": "La regola è parzialmente disponibile, ma autonomia e trasferimento verso l'interazione sono ancora fragili."
+  },
+  "decision": {
+    "action": "consolidate",
+    "confidence": 0.76,
+    "same_target": "eng.grammar.present_simple",
+    "reason_not_advance": "L'accuratezza nella pratica controllata non è accompagnata da sufficiente indipendenza nell'uso.",
+    "reason_not_recover": "Non emerge un prerequisito precedente specifico che spieghi il pattern.",
+    "reason_not_reassess": "Le evidenze sono abbastanza coerenti per localizzare il problema nell'automatizzazione e nell'uso autonomo."
+  },
+  "next_activity_intent": [
+    "ridurre progressivamente i prompt",
+    "passare da frasi isolate a scambi sulla routine",
+    "alternare affermativa, negativa e domanda in un contesto comunicativo",
+    "verificare una seconda volta senza modello visibile"
+  ],
+  "success_condition": "Il Present Simple può diventare candidato ad advance quando compaiono almeno due evidenze autonome e una variazione di contesto senza errore sistematico sulla struttura."
+}
