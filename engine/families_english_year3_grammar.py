@@ -16,21 +16,21 @@ def present_perfect_experience(phase,seed,band,support,task_id):
 def present_perfect_vs_past(phase,seed,band,support,task_id):
     r=_r(seed); marker=r.choice(["last year","yesterday","in 2024"])
     if phase_mode(phase)=="transfer":
-        return open_task(task_id,"eng.y3.pp-vs-past.contrast",f"Write two connected questions about travel: one with 'Have you ever...?' and one asking when/where the event happened. Explain how the time reference changes the tense.",band,support,params={"marker":marker},dimensions=["grammar","meaning","explanation"],acceptable="experience with Present Perfect; dated event with Past Simple")
+        return open_task(task_id,"eng.y3.pp-vs-past.contrast","Write two connected questions about travel: one with 'Have you ever...?' and one asking when/where the event happened. Explain how the time reference changes the tense.",band,support,params={"marker":marker},dimensions=["grammar","meaning","explanation"],acceptable="experience with Present Perfect; dated event with Past Simple")
     return task(task_id,"eng.y3.pp-vs-past.choose",f"Choose the correct tense: I ___ to Rome {marker}. (go)","went",band,support,params={"marker":marker},dimensions=["accuracy","grammar"])
 
 def will_future(phase,seed,band,support,task_id):
     r=_r(seed); situation=r.choice(["The phone is ringing.","I think cities will be greener.","This bag is heavy."])
-    answer={"The phone is ringing.":"I'll answer it.","I think cities will be greener.":"prediction","This bag is heavy.":"I'll help you."}[situation]
     if phase_mode(phase)=="transfer":
         return open_task(task_id,"eng.y3.will.function",f"Situation: {situation} Produce a natural sentence with will and explain whether it is a prediction, instant decision, offer or promise.",band,support,params={"situation":situation},dimensions=["grammar","meaning","production"],acceptable="appropriate use of will for the communicative function")
-    return task(task_id,"eng.y3.will.recognise",f"In '{situation}' which is the most likely function of will: prediction, instant decision/offer, or fixed arrangement?",("prediction" if "think" in situation else "instant decision/offer"),band,support,params={"situation":situation},dimensions=["accuracy","meaning"])
+    answer="prediction" if "think" in situation else "instant decision/offer"
+    return task(task_id,"eng.y3.will.recognise",f"In '{situation}' which is the most likely function of will: prediction, instant decision/offer, or fixed arrangement?",answer,band,support,params={"situation":situation},dimensions=["accuracy","meaning"])
 
 def first_conditional(phase,seed,band,support,task_id):
-    r=_r(seed); condition=r.choice(["it rains","we finish early","you study regularly"]); result=r.choice(["we'll stay inside","we'll go for a walk","you'll improve"])
+    r=_r(seed); condition=r.choice(["it rains","we finish early","you study regularly"]); consequence=r.choice(["stay inside","go for a walk","improve"])
     if phase_mode(phase)=="transfer":
         return open_task(task_id,"eng.y3.first-conditional.logic",f"Create a logical first conditional using the idea '{condition}' and a realistic consequence. Then rewrite it with the result clause first without changing the meaning.",band,support,params={"condition":condition},dimensions=["grammar","logic","production"],acceptable="if + Present Simple, will + base verb; logical consequence")
-    return task(task_id,"eng.y3.first-conditional.complete",f"Complete: If {condition}, {result.replace("we'll","we ___").replace("you'll","you ___")}","will",band,support,params={"condition":condition,"result":result},dimensions=["accuracy","grammar"])
+    return task(task_id,"eng.y3.first-conditional.complete",f"Complete with the correct future auxiliary: If {condition}, we ___ {consequence}.","will",band,support,params={"condition":condition,"consequence":consequence},dimensions=["accuracy","grammar"])
 
 def may_might(phase,seed,band,support,task_id):
     r=_r(seed); event=r.choice(["rain tomorrow","be late","visit us this weekend"])
@@ -39,7 +39,7 @@ def may_might(phase,seed,band,support,task_id):
     return task(task_id,"eng.y3.may-might.form",f"Complete with a modal of possibility: It ___ {event}.","may/might",band,support,params={"event":event},dimensions=["accuracy","grammar"])
 
 def relative_clauses(phase,seed,band,support,task_id):
-    r=_r(seed); antecedent=r.choice([("a doctor","who"),("a device","which"),("a book","that")]); noun,rel=antecedent
+    r=_r(seed); noun,rel=r.choice([("a doctor","who"),("a device","which"),("a book","that")])
     if phase_mode(phase)=="transfer":
         return open_task(task_id,"eng.y3.relative.combine",f"Combine two short sentences into one relative clause about {noun}. Explain why you chose who, which or that.",band,support,params={"noun":noun,"rel":rel},dimensions=["grammar","cohesion","explanation"],acceptable=f"relative clause with {rel} or another valid choice")
     return task(task_id,"eng.y3.relative.choose",f"Choose a relative pronoun: {noun} is something/someone ___ can help in this context.",rel,band,support,params={"noun":noun},dimensions=["accuracy","grammar"])
@@ -57,9 +57,9 @@ def reported_speech(phase,seed,band,support,task_id):
     return open_task(task_id,"eng.y3.reported.basic",f"Report this message simply: '{quote}'.",band,support,params={"quote":quote},dimensions=["grammar","meaning"],acceptable="reported content with coherent pronoun/tense choices")
 
 def connectors(phase,seed,band,support,task_id):
-    r=_r(seed); relation=r.choice([("cause","because"),("result","so"),("contrast","but"),("sequence","then")]); kind,conn=relation
+    r=_r(seed); kind,conn=r.choice([("cause","because"),("result","so"),("contrast","but"),("sequence","then")])
     if phase_mode(phase)=="transfer":
-        return open_task(task_id,"eng.y3.connectors.cohesion",f"Write a short four-sentence paragraph that includes a clear cause, result, contrast and sequence. Use suitable connectors and explain one choice.",band,support,params={"focus":kind},dimensions=["cohesion","grammar","writing"],acceptable="logical use of because/so/but/sequence connectors")
+        return open_task(task_id,"eng.y3.connectors.cohesion","Write a short four-sentence paragraph that includes a clear cause, result, contrast and sequence. Use suitable connectors and explain one choice.",band,support,params={"focus":kind},dimensions=["cohesion","grammar","writing"],acceptable="logical use of because/so/but/sequence connectors")
     return task(task_id,"eng.y3.connectors.choose",f"Which connector best signals {kind}: because, so, but or then?",conn,band,support,params={"relation":kind},dimensions=["accuracy","cohesion"])
 
 ENGLISH_Y3_GRAMMAR_BUILDERS={
