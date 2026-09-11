@@ -1,5 +1,16 @@
 # TutorLab Roadmap
 
+## Stato dei macro-blocchi
+
+- [x] **Fondazioni pedagogiche + Difficulty Engine v0.1**
+- [x] **Curriculum Matematica 1ª-3ª media + grafo dei prerequisiti v0.1**
+- [ ] **Curriculum Inglese 1ª-3ª media + progressione A1-A2**
+- [ ] **Motore adattivo: diagnosi, errori e decisione del passo successivo**
+- [ ] **Generazione di sessioni didattiche complete e criteri di qualità**
+- [ ] **Profili studente e contratto futuro con Hub Scuola**
+
+I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco viene considerato completato solo quando produce un sottosistema coerente, documentato e verificabile.
+
 ## v0.1 — Fondazioni
 
 Obiettivo: dimostrare che TutorLab possiede un metodo didattico coerente e rappresentabile in dati strutturati.
