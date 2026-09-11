@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.dev/schemas/evidence-event.schema.json",
+  "title": "TutorLab Evidence Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "event_id", "competency_id", "observed_at", "task", "outcome", "support"],
+  "properties": {
+    "version": {"type": "string", "const": "0.1"},
+    "event_id": {"type": "string", "minLength": 1},
+    "competency_id": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "source": {"type": "string", "enum": ["tutor_session", "independent_practice", "assessment", "conversation", "imported"]},
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "mode"],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1},
+        "mode": {"type": "string", "enum": ["diagnostic", "guided", "practice", "verification", "transfer", "oral", "written", "receptive", "interactive"]},
+        "challenge_band": {"type": "integer", "minimum": 1, "maximum": 5},
+        "representation": {"type": "string"},
+        "context_familiarity": {"type": "string", "enum": ["familiar", "near_transfer", "farther_transfer", "unknown"]}
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"type": "string", "enum": ["correct", "partially_correct", "incorrect", "not_completed", "not_observable"]},
+        "score": {"type": "number", "minimum": 0, "maximum": 1},
+        "self_corrected": {"type": "boolean"},
+        "explanation_quality": {"type": "number", "minimum": 0, "maximum": 1},
+        "transfer_success": {"type": "number", "minimum": 0, "maximum": 1},
+        "notes": {"type": "string"}
+      }
+    },
+    "support": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": {"type": "string", "enum": ["none", "light_prompt", "structured_prompt", "worked_support", "direct_solution"]},
+        "prompt_count": {"type": "integer", "minimum": 0},
+        "reference_used": {"type": "boolean"},
+        "feedback_before_completion": {"type": "boolean"}
+      }
+    },
+    "latency_seconds": {"type": "number", "minimum": 0},
+    "error_observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "description"],
+        "properties": {
+          "code": {"type": "string", "enum": ["conceptual_error", "missing_prerequisite", "procedure_error", "execution_error", "instruction_comprehension", "strategy_selection", "attention_lapse", "not_automated", "persistent_difficulty", "other"]},
+          "description": {"type": "string", "minLength": 1},
+          "related_competency_id": {"type": "string"},
+          "observer_confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "tags": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+  }
+}
