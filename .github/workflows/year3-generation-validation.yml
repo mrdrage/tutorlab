@@ -1,0 +1,32 @@
+name: Year-3 and triennium generation coverage
+
+on:
+  pull_request:
+    paths:
+      - 'engine/**'
+      - 'curriculum/middle-school/mathematics/year-3.json'
+      - 'curriculum/middle-school/english/year-3.json'
+      - 'tools/check_year3_generation_coverage.py'
+      - 'tools/check_full_triennium_generation_coverage.py'
+      - '.github/workflows/year3-generation-validation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'engine/**'
+      - 'curriculum/middle-school/mathematics/year-3.json'
+      - 'curriculum/middle-school/english/year-3.json'
+      - 'tools/check_year3_generation_coverage.py'
+      - 'tools/check_full_triennium_generation_coverage.py'
+
+jobs:
+  validate-year3-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate complete third-year generation coverage
+        run: python3 tools/check_year3_generation_coverage.py
+      - name: Validate complete three-year generation coverage
+        run: python3 tools/check_full_triennium_generation_coverage.py
