@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from engine.adaptive_engine import decide
+from engine.decision_record import build_decision_record
 from engine.diagnostic_planner import plan_reassessment
 from engine.evidence_model import aggregate_competency_state
 from engine.objective_stack import complete_current, current_objective, push_recovery, recovery_depth, start_objective
@@ -63,6 +64,18 @@ def main():
         errors.append("diagnostic planner non verifica il prerequisito sospetto")
 
     stack = start_objective("math.numbers.proportions")
+    record = build_decision_record(
+        result,
+        target_competency_id="math.numbers.proportions",
+        evidence_refs=[event["event_id"] for event in events],
+        primary_hypothesis=state["error_hypotheses"][0],
+        objective_stack=stack,
+    )
+    if record.get("action") != "recover" or record.get("recovery", {}).get("recovery_competency_id") != "math.numbers.ratios":
+        errors.append("decision record non conserva la decisione recover")
+    if len(record.get("evidence_refs", [])) != 4:
+        errors.append("decision record non conserva i riferimenti alle evidenze")
+
     stack = push_recovery(stack, "math.numbers.ratios", reason="missing prerequisite", max_depth=2)
     stack = push_recovery(stack, "math.numbers.fraction-equivalence", reason="ratio representation unstable", max_depth=2)
     if recovery_depth(stack) != 2 or current_objective(stack) != "math.numbers.fraction-equivalence":
@@ -92,6 +105,7 @@ def main():
     print(f"Routing scenarios: {len(suite['scenarios'])}")
     print("Evidence pipeline: OK")
     print("Diagnostic planner: OK")
+    print("Decision record: OK")
     print("Objective stack: OK")
     return 0
 
