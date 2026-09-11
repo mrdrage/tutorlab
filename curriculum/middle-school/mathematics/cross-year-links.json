@@ -1,0 +1,107 @@
+{
+  "version": "0.1.0",
+  "subject": "mathematics",
+  "purpose": "Esplicitare i passaggi verticali ad alto impatto e i bersagli di recupero tra anni. Le dipendenze complete restano nei prerequisite di ogni nodo.",
+  "gateway_links": [
+    {
+      "from": "math.numbers.natural-operations",
+      "to": ["math.numbers.numeric-expressions-natural", "math.numbers.divisibility", "math.numbers.fraction-meaning"],
+      "recovery_rule": "Se gli errori di calcolo di base sono sistematici, recuperare le operazioni prima di aumentare la complessità simbolica."
+    },
+    {
+      "from": "math.numbers.divisibility",
+      "to": ["math.numbers.prime-factorization", "math.numbers.fraction-equivalence"],
+      "recovery_rule": "Se semplificazione e denominatori comuni falliscono per mancato riconoscimento di fattori, tornare a divisibilità e fattorizzazione."
+    },
+    {
+      "from": "math.numbers.gcd-lcm",
+      "to": ["math.numbers.fraction-operations"],
+      "recovery_rule": "Non richiedere mcm come rituale quando esiste una strategia più semplice; il prerequisito è la comprensione dei multipli comuni."
+    },
+    {
+      "from": "math.numbers.fraction-equivalence",
+      "to": ["math.numbers.fraction-comparison", "math.numbers.fraction-operations", "math.numbers.rational-decimal-representations", "math.numbers.ratios"],
+      "recovery_rule": "È uno dei gateway principali: se l'equivalenza non è stabile, sospendere proporzioni e calcolo frazionario avanzato."
+    },
+    {
+      "from": "math.numbers.fraction-operations",
+      "to": ["math.numbers.rational-decimal-representations", "math.numbers.proportions", "math.numbers.rational-expressions"],
+      "recovery_rule": "Distinguere errore concettuale sull'operazione da semplice errore esecutivo prima di decidere il recupero."
+    },
+    {
+      "from": "math.numbers.ratios",
+      "to": ["math.numbers.proportions", "math.geometry.similarity", "math.relations.direct-proportionality"],
+      "recovery_rule": "Se lo studente sa usare il prodotto incrociato ma non interpreta il rapporto, recuperare il rapporto prima della proporzionalità."
+    },
+    {
+      "from": "math.numbers.proportions",
+      "to": ["math.numbers.percentages", "math.relations.direct-proportionality", "math.relations.inverse-proportionality", "math.geometry.similarity"],
+      "recovery_rule": "Verificare anche strategie alternative alla proporzione formale: fattore di scala e riduzione all'unità."
+    },
+    {
+      "from": "math.geometry.area-concept",
+      "to": ["math.geometry.areas-polygons"],
+      "recovery_rule": "Se area e perimetro sono confusi, non compensare con più formule: recuperare il significato di misura bidimensionale."
+    },
+    {
+      "from": "math.geometry.areas-polygons",
+      "to": ["math.geometry.pythagoras", "math.geometry.surface-area", "math.geometry.volume"],
+      "recovery_rule": "La geometria solida richiede aree piane sufficientemente automatizzate; recuperare la figura di base specifica invece dell'intero capitolo."
+    },
+    {
+      "from": "math.numbers.square-root",
+      "to": ["math.geometry.pythagoras", "math.numbers.irrational-awareness"],
+      "recovery_rule": "Separare il significato della radice dalla procedura di calcolo o dall'uso della calcolatrice."
+    },
+    {
+      "from": "math.geometry.pythagoras",
+      "to": ["math.geometry.euclid-theorems", "math.geometry.surface-area", "math.geometry.volume"],
+      "recovery_rule": "Se lo studente non riconosce il triangolo rettangolo nascosto, lavorare sulla rappresentazione prima dell'algebra numerica."
+    },
+    {
+      "from": "math.geometry.cartesian-plane",
+      "to": ["math.relations.direct-proportionality", "math.relations.inverse-proportionality", "math.relations.multiple-representations", "math.relations.function-families"],
+      "recovery_rule": "Errori di grafico possono dipendere da coordinate, scala o relazione matematica: diagnosticare quale componente è instabile."
+    },
+    {
+      "from": "math.relations.sequences",
+      "to": ["math.relations.symbolic-generalization", "math.practice.algorithmic-thinking"],
+      "recovery_rule": "Prima del simbolismo letterale verificare che la regolarità sia descrivibile verbalmente e numericamente."
+    },
+    {
+      "from": "math.numbers.signed-number-sense",
+      "to": ["math.numbers.signed-operations"],
+      "recovery_rule": "Se il confronto tra negativi è instabile, non introdurre regole operative come puro automatismo."
+    },
+    {
+      "from": "math.numbers.signed-operations",
+      "to": ["math.numbers.rational-expressions", "math.relations.algebraic-expressions", "math.relations.first-degree-equations"],
+      "recovery_rule": "È il principale gateway numerico dell'algebra di terza: recuperare il segno specifico che causa l'errore."
+    },
+    {
+      "from": "math.relations.symbolic-generalization",
+      "to": ["math.relations.algebraic-expressions", "math.relations.multiple-representations"],
+      "recovery_rule": "Se la lettera è trattata come simbolo opaco, tornare a pattern e formule contestualizzate."
+    },
+    {
+      "from": "math.relations.algebraic-expressions",
+      "to": ["math.relations.first-degree-equations"],
+      "recovery_rule": "Prima delle equazioni devono essere stabili sostituzione, distributiva, termini simili e segni."
+    },
+    {
+      "from": "math.data.frequencies",
+      "to": ["math.data.central-tendency", "math.data.elementary-probability"],
+      "recovery_rule": "Verificare il significato di frequenza relativa prima di passare da dati osservati a probabilità."
+    },
+    {
+      "from": "math.practice.problem-representation",
+      "to": ["math.practice.modelling", "math.practice.integrated-problem-solving"],
+      "recovery_rule": "Se un problema avanzato fallisce prima del calcolo, ridurre il carico numerico e testare rappresentazione e scelta dei dati."
+    },
+    {
+      "from": "math.practice.modelling",
+      "to": ["math.practice.integrated-problem-solving"],
+      "recovery_rule": "Il recupero deve preservare l'autonomia: offrire supporto sulla rappresentazione senza anticipare la strategia completa."
+    }
+  ]
+}
