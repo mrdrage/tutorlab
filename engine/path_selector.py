@@ -7,11 +7,12 @@ ROOT = Path(__file__).resolve().parents[1]
 SECURE = {"secure", "extended"}
 WEAK = {"emerging", "developing"}
 PRIORITY = {"gateway": 0, "core": 1, "supporting": 2, "extension": 3}
+SUPPORTED_SUBJECTS = {"mathematics", "english", "italian", "french", "spanish"}
 
 
 def _folder(subject):
-    if subject == "mathematics": return "mathematics"
-    if subject == "english": return "english"
+    if subject in SUPPORTED_SUBJECTS:
+        return subject
     raise ValueError("unsupported subject")
 
 

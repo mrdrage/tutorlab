@@ -14,6 +14,7 @@ from engine.families_english_year3_grammar import ENGLISH_Y3_GRAMMAR_BUILDERS
 from engine.families_english_year3_lexis_phonology import ENGLISH_Y3_LEXIS_PHONOLOGY_BUILDERS
 from engine.families_english_year3_productive import ENGLISH_Y3_PRODUCTIVE_BUILDERS
 from engine.families_english_year3_receptive import ENGLISH_Y3_RECEPTIVE_BUILDERS
+from engine.families_languages import FRENCH_BUILDERS, ITALIAN_BUILDERS, SPANISH_BUILDERS
 from engine.families_math import fraction_equivalence_task
 from engine.families_math_year1_geometry import GEOMETRY_DATA_BUILDERS
 from engine.families_math_year1_numbers import NUMBER_BUILDERS
@@ -51,6 +52,9 @@ for group in (
     ENGLISH_Y3_LEXIS_PHONOLOGY_BUILDERS,
     ENGLISH_Y3_RECEPTIVE_BUILDERS,
     ENGLISH_Y3_PRODUCTIVE_BUILDERS,
+    ITALIAN_BUILDERS,
+    FRENCH_BUILDERS,
+    SPANISH_BUILDERS,
 ):
     REGISTRY.update(group)
 

@@ -2,42 +2,35 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://tutorlab.dev/schemas/language-curriculum-graph.schema.json",
   "title": "TutorLab Language Curriculum Graph",
-  "description": "Schema per curriculum linguistici TutorLab basati su competenze, prerequisiti e profilo QCER.",
+  "description": "Schema unico per i curriculum linguistici TutorLab della scuola secondaria di primo grado. Italiano usa i domini propri della lingua madre; inglese, francese e spagnolo possono aggiungere ancoraggi QCER.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "subject", "school_stage", "curriculum_profile", "typical_year", "target_cefr", "nodes"],
+  "required": ["version", "subject", "school_stage", "curriculum_profile", "typical_year", "sequencing_note", "nodes"],
   "properties": {
     "version": {"type": "string"},
-    "subject": {"type": "string", "enum": ["english"]},
-    "school_stage": {"type": "string", "enum": ["middle_school"]},
-    "curriculum_profile": {"type": "string"},
+    "subject": {"type": "string", "enum": ["english", "italian", "french", "spanish"]},
+    "school_stage": {"const": "middle_school"},
+    "curriculum_profile": {"type": "string", "minLength": 1},
     "typical_year": {"type": "integer", "minimum": 1, "maximum": 3},
     "target_cefr": {"type": "string", "enum": ["A1", "A2"]},
-    "sequencing_note": {"type": "string"},
+    "sequencing_note": {"type": "string", "minLength": 1},
     "nodes": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "title", "strand", "typical_year", "priority", "cefr_anchor", "progression_stage", "prerequisites", "objectives", "mastery_evidence"],
+        "required": ["id", "title", "strand", "typical_year", "priority", "prerequisites", "objectives", "mastery_evidence"],
         "properties": {
-          "id": {"type": "string", "pattern": "^eng\\.[a-z0-9._-]+$"},
+          "id": {"type": "string", "pattern": "^(eng|ita|fr|es)\\.[a-z0-9._-]+$"},
           "title": {"type": "string", "minLength": 1},
           "strand": {
             "type": "string",
             "enum": [
-              "grammar",
-              "vocabulary",
-              "phonology",
-              "reading",
-              "listening",
-              "spoken_interaction",
-              "spoken_production",
-              "writing",
-              "mediation",
-              "intercultural",
-              "learning_strategies"
+              "grammar", "vocabulary", "phonology", "reading", "listening",
+              "interaction", "spoken_interaction", "spoken_production", "writing", "mediation",
+              "intercultural", "learning_strategy", "learning_strategies", "integrated",
+              "oral", "text_analysis", "study_strategy"
             ]
           },
           "typical_year": {"type": "integer", "minimum": 1, "maximum": 3},
@@ -45,11 +38,11 @@
           "cefr_anchor": {"type": "string", "enum": ["A1", "A2"]},
           "progression_stage": {
             "type": "string",
-            "enum": ["A1_core", "A1_to_A2", "A2_core", "A2_extension"]
+            "enum": ["A1_foundation", "A1_developing", "A1_target", "A1_core", "A1_to_A2", "A2_core", "A2_extension"]
           },
           "prerequisites": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
-          "objectives": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-          "mastery_evidence": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "objectives": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "mastery_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
           "diagnostic_signals": {"type": "array", "items": {"type": "string"}},
           "difficulty_levers": {"type": "array", "items": {"type": "string"}},
           "communicative_functions": {"type": "array", "items": {"type": "string"}},
@@ -58,5 +51,44 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"subject": {"enum": ["english", "french", "spanish"]}}, "required": ["subject"]},
+      "then": {"required": ["target_cefr"]}
+    },
+    {
+      "if": {"properties": {"subject": {"enum": ["french", "spanish"]}}, "required": ["subject"]},
+      "then": {
+        "properties": {
+          "target_cefr": {"const": "A1"},
+          "nodes": {
+            "items": {
+              "required": ["cefr_anchor", "progression_stage"],
+              "properties": {
+                "cefr_anchor": {"const": "A1"},
+                "progression_stage": {"enum": ["A1_foundation", "A1_developing", "A1_target"]}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"subject": {"const": "english"}}, "required": ["subject"]},
+      "then": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "required": ["cefr_anchor", "progression_stage"],
+              "properties": {
+                "cefr_anchor": {"enum": ["A1", "A2"]},
+                "progression_stage": {"enum": ["A1_core", "A1_to_A2", "A2_core", "A2_extension"]}
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
