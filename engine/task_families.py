@@ -7,10 +7,16 @@ from engine.families_english_year1_grammar_use import GRAMMAR_USE_BUILDERS
 from engine.families_english_year1_lexis import LEXIS_BUILDERS
 from engine.families_english_year1_productive import PRODUCTIVE_BUILDERS
 from engine.families_english_year1_receptive import RECEPTIVE_BUILDERS
+from engine.families_english_year2_grammar import ENGLISH_Y2_GRAMMAR_BUILDERS
+from engine.families_english_year2_productive import ENGLISH_Y2_PRODUCTIVE_BUILDERS
+from engine.families_english_year2_receptive import ENGLISH_Y2_RECEPTIVE_BUILDERS
 from engine.families_math import fraction_equivalence_task
 from engine.families_math_year1_geometry import GEOMETRY_DATA_BUILDERS
 from engine.families_math_year1_numbers import NUMBER_BUILDERS
 from engine.families_math_year1_practices import PRACTICE_BUILDERS
+from engine.families_math_year2_geometry_data import MATH_Y2_GEOMETRY_DATA_BUILDERS
+from engine.families_math_year2_numbers_relations import MATH_Y2_NUMBER_RELATION_BUILDERS
+from engine.families_math_year2_practices import MATH_Y2_PRACTICE_BUILDERS
 
 REGISTRY = {
     "math.numbers.fraction-equivalence": fraction_equivalence_task,
@@ -25,6 +31,12 @@ for group in (
     LEXIS_BUILDERS,
     RECEPTIVE_BUILDERS,
     PRODUCTIVE_BUILDERS,
+    MATH_Y2_NUMBER_RELATION_BUILDERS,
+    MATH_Y2_GEOMETRY_DATA_BUILDERS,
+    MATH_Y2_PRACTICE_BUILDERS,
+    ENGLISH_Y2_GRAMMAR_BUILDERS,
+    ENGLISH_Y2_RECEPTIVE_BUILDERS,
+    ENGLISH_Y2_PRODUCTIVE_BUILDERS,
 ):
     REGISTRY.update(group)
 
