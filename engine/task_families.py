@@ -10,6 +10,10 @@ from engine.families_english_year1_receptive import RECEPTIVE_BUILDERS
 from engine.families_english_year2_grammar import ENGLISH_Y2_GRAMMAR_BUILDERS
 from engine.families_english_year2_productive import ENGLISH_Y2_PRODUCTIVE_BUILDERS
 from engine.families_english_year2_receptive import ENGLISH_Y2_RECEPTIVE_BUILDERS
+from engine.families_english_year3_grammar import ENGLISH_Y3_GRAMMAR_BUILDERS
+from engine.families_english_year3_lexis_phonology import ENGLISH_Y3_LEXIS_PHONOLOGY_BUILDERS
+from engine.families_english_year3_productive import ENGLISH_Y3_PRODUCTIVE_BUILDERS
+from engine.families_english_year3_receptive import ENGLISH_Y3_RECEPTIVE_BUILDERS
 from engine.families_math import fraction_equivalence_task
 from engine.families_math_year1_geometry import GEOMETRY_DATA_BUILDERS
 from engine.families_math_year1_numbers import NUMBER_BUILDERS
@@ -17,6 +21,9 @@ from engine.families_math_year1_practices import PRACTICE_BUILDERS
 from engine.families_math_year2_geometry_data import MATH_Y2_GEOMETRY_DATA_BUILDERS
 from engine.families_math_year2_numbers_relations import MATH_Y2_NUMBER_RELATION_BUILDERS
 from engine.families_math_year2_practices import MATH_Y2_PRACTICE_BUILDERS
+from engine.families_math_year3_geometry_data import MATH_Y3_GEOMETRY_DATA_BUILDERS
+from engine.families_math_year3_numbers_algebra import MATH_Y3_NUMBERS_ALGEBRA_BUILDERS
+from engine.families_math_year3_practices import MATH_Y3_PRACTICE_BUILDERS
 
 REGISTRY = {
     "math.numbers.fraction-equivalence": fraction_equivalence_task,
@@ -37,6 +44,13 @@ for group in (
     ENGLISH_Y2_GRAMMAR_BUILDERS,
     ENGLISH_Y2_RECEPTIVE_BUILDERS,
     ENGLISH_Y2_PRODUCTIVE_BUILDERS,
+    MATH_Y3_NUMBERS_ALGEBRA_BUILDERS,
+    MATH_Y3_GEOMETRY_DATA_BUILDERS,
+    MATH_Y3_PRACTICE_BUILDERS,
+    ENGLISH_Y3_GRAMMAR_BUILDERS,
+    ENGLISH_Y3_LEXIS_PHONOLOGY_BUILDERS,
+    ENGLISH_Y3_RECEPTIVE_BUILDERS,
+    ENGLISH_Y3_PRODUCTIVE_BUILDERS,
 ):
     REGISTRY.update(group)
 
