@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.dev/schemas/objective-stack.schema.json",
+  "title": "TutorLab Objective Stack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["root_target_id", "frames"],
+  "properties": {
+    "root_target_id": {"type": "string", "minLength": 1},
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["competency_id", "kind", "reason"],
+        "properties": {
+          "competency_id": {"type": "string", "minLength": 1},
+          "kind": {"type": "string", "enum": ["target", "recovery"]},
+          "reason": {"type": "string", "minLength": 1},
+          "return_to": {"type": "string"}
+        }
+      }
+    }
+  }
+}
