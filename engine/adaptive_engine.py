@@ -15,6 +15,20 @@ class Decision:
     recovery_competency_id: str | None = None
 
 
+def _mastery_value(raw: Any) -> float:
+    if isinstance(raw, dict):
+        value = float(raw.get("value", 0.0))
+        confidence = float(raw.get("confidence", 0.0))
+        return value * confidence
+    return float(raw or 0.0)
+
+
+def _mastery_values(mastery: dict[str, Any], confidence: float) -> dict[str, float]:
+    values = {key: _mastery_value(value) for key, value in mastery.items()}
+    values["confidence"] = confidence
+    return values
+
+
 def _meets(values: dict[str, float], thresholds: dict[str, float]) -> bool:
     return all(float(values.get(key, 0.0)) >= float(value) for key, value in thresholds.items())
 
@@ -34,10 +48,11 @@ def decide(
     suggested_next_id: str | None = None,
     recovery_depth: int = 0,
 ) -> Decision:
-    """Return a transparent routing decision from an already-computed competency state.
+    """Return a transparent routing decision from a competency state.
 
-    This v0.1 function deliberately does not infer clinical conditions, mutate evidence,
-    or hide the policy behind a learned model.
+    Mastery dimensions may be plain numbers in legacy fixtures or confidence-aware
+    estimates of the form {"value": ..., "confidence": ...}. Unknown dimensions
+    therefore cannot accidentally count as secure evidence.
     """
 
     confidence = float(target_state.get("confidence", 0.0))
@@ -60,11 +75,7 @@ def decide(
         h_conf = float(hypothesis.get("confidence", 0.0))
         related = hypothesis.get("related_competency_id")
 
-        if (
-            code == "missing_prerequisite"
-            and h_conf >= strong_error
-            and related
-        ):
+        if code == "missing_prerequisite" and h_conf >= strong_error and related:
             if recovery_depth >= int(policy["max_recovery_depth"]):
                 return Decision(
                     action="reassess",
@@ -86,10 +97,10 @@ def decide(
                 next_competency_id=current_target_id,
             )
 
-    mastery = target_state.get("mastery", {})
+    mastery = _mastery_values(target_state.get("mastery", {}), confidence)
     independent = int(evidence.get("independent_event_count", 0))
 
-    if _meets(mastery | {"confidence": confidence}, policy["extend"]):
+    if _meets(mastery, policy["extend"]):
         return Decision(
             action="extend",
             confidence=confidence,
@@ -97,10 +108,7 @@ def decide(
             next_competency_id=current_target_id,
         )
 
-    if (
-        independent >= int(policy["min_independent_for_advance"])
-        and _meets(mastery | {"confidence": confidence}, policy["advance"])
-    ):
+    if independent >= int(policy["min_independent_for_advance"]) and _meets(mastery, policy["advance"]):
         return Decision(
             action="advance",
             confidence=confidence,
