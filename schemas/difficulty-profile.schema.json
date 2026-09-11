@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.dev/schemas/difficulty-profile.schema.json",
+  "title": "TutorLab Difficulty Profile",
+  "description": "Profilo multidimensionale della difficoltà di un'attività, separato dal supporto e dal learner fit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "challenge_band", "challenge_dimensions", "support_profile", "rationale"],
+  "properties": {
+    "version": {"type": "string", "const": "0.1"},
+    "challenge_band": {"type": "integer", "minimum": 1, "maximum": 5},
+    "challenge_dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conceptual_novelty", "process_depth", "strategy_selection", "representation_demand", "transfer_distance", "information_load", "language_demand", "reasoning_demand", "precision_demand"],
+      "properties": {
+        "conceptual_novelty": {"$ref": "#/$defs/zeroToFour"},
+        "process_depth": {"$ref": "#/$defs/zeroToFour"},
+        "strategy_selection": {"$ref": "#/$defs/zeroToFour"},
+        "representation_demand": {"$ref": "#/$defs/zeroToFour"},
+        "transfer_distance": {"$ref": "#/$defs/zeroToFour"},
+        "information_load": {"$ref": "#/$defs/zeroToFour"},
+        "language_demand": {"$ref": "#/$defs/zeroToFour"},
+        "reasoning_demand": {"$ref": "#/$defs/zeroToFour"},
+        "precision_demand": {"$ref": "#/$defs/zeroToFour"}
+      }
+    },
+    "support_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["worked_example_support", "step_decomposition", "prompting", "reference_support", "feedback_immediacy", "choice_reduction"],
+      "properties": {
+        "worked_example_support": {"$ref": "#/$defs/zeroToFour"},
+        "step_decomposition": {"$ref": "#/$defs/zeroToFour"},
+        "prompting": {"$ref": "#/$defs/zeroToFour"},
+        "reference_support": {"$ref": "#/$defs/zeroToFour"},
+        "feedback_immediacy": {"$ref": "#/$defs/zeroToFour"},
+        "choice_reduction": {"$ref": "#/$defs/zeroToFour"}
+      }
+    },
+    "subject_adapter": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 4}
+    },
+    "learner_fit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {"type": "string", "enum": ["under_challenging", "productive", "over_challenging", "uncertain"]},
+        "prerequisite_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "autonomy_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "evidence_notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "critical_dimensions": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "rationale": {"type": "string", "minLength": 1},
+    "delta_from_previous": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension", "change", "reason"],
+        "properties": {
+          "dimension": {"type": "string"},
+          "change": {"type": "integer", "minimum": -4, "maximum": 4},
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "tutor_override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason"],
+      "properties": {
+        "challenge_band": {"type": "integer", "minimum": 1, "maximum": 5},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "$defs": {"zeroToFour": {"type": "integer", "minimum": 0, "maximum": 4}}
+}
