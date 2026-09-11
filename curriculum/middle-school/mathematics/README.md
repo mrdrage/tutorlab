@@ -80,7 +80,31 @@ Allo stesso modo, una competenza già solida può essere attraversata rapidament
 - `year-2.json` — razionali, rapporti/proporzioni, percentuali, aree, Pitagora, statistica e prime funzioni;
 - `year-3.json` — numeri con segno, algebra, equazioni, funzioni, geometria solida e probabilità;
 - `cross-year-links.json` — dipendenze verticali e gateway tra anni;
-- `sources.md` — fonti curricolari e politica di versionamento.
+- `map.md` — vista sintetica leggibile dal tutor;
+- `sources.md` — fonti curricolari e politica di versionamento;
+- `../../../tests/curriculum/mathematics-v0.1.md` — acceptance test pedagogici.
+
+## Validazione strutturale
+
+Dalla root del repository:
+
+```bash
+python3 tools/validate_curriculum.py
+```
+
+Il validatore usa soltanto la standard library e controlla almeno:
+
+- JSON leggibili;
+- ID duplicati;
+- prerequisiti inesistenti;
+- auto-prerequisiti;
+- cicli nel grafo;
+- coerenza tra file annuale e `typical_year`;
+- nuclei e priorità riconosciuti;
+- gateway link verso nodi esistenti;
+- presenza di obiettivi ed evidenze di padronanza.
+
+Il validatore non sostituisce la revisione pedagogica: un grafo può essere formalmente valido ma didatticamente sbagliato. Gli acceptance test servono precisamente a coprire questa seconda dimensione.
 
 ## Stato
 
