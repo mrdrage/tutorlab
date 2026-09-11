@@ -1,0 +1,24 @@
+{
+  "version": "0.1",
+  "default_duration_minutes": 40,
+  "min_duration_minutes": 20,
+  "max_duration_minutes": 90,
+  "max_generation_attempts": 12,
+  "default_challenge_band_by_action": {"recover": 1, "consolidate": 2, "advance": 2, "extend": 4, "reassess": 2},
+  "phase_templates": {
+    "recover": ["diagnostic_check", "essential_explanation", "worked_example", "guided_practice", "independent_practice", "transfer", "reassessment"],
+    "consolidate": ["retrieval", "targeted_model", "faded_practice", "independent_practice", "transfer", "verification"],
+    "advance": ["activation", "essential_explanation", "worked_example", "faded_practice", "independent_practice", "transfer", "verification"],
+    "extend": ["challenge", "strategy_comparison", "transfer", "explanation", "reflection"],
+    "reassess": ["diagnostic_check", "contrast_task", "transfer_probe", "reflection"]
+  },
+  "support_order": ["worked_support", "structured_prompt", "light_prompt", "none"],
+  "rules": {
+    "reassess_teaches_before_measurement": false,
+    "recover_must_end_with_reassessment": true,
+    "advance_requires_independent_task": true,
+    "every_instructional_session_requires_transfer": true,
+    "student_view_hides_solutions": true,
+    "open_response_requires_external_scoring": true
+  }
+}

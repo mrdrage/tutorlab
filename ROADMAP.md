@@ -6,7 +6,7 @@
 - [x] **Curriculum Matematica 1ª-3ª media + grafo dei prerequisiti v0.1**
 - [x] **Curriculum Inglese 1ª-3ª media + progressione A1-A2**
 - [x] **Motore adattivo: diagnosi, errori e decisione del passo successivo**
-- [ ] **Generazione di sessioni didattiche complete e criteri di qualità**
+- [x] **Generazione di sessioni didattiche complete e criteri di qualità**
 - [ ] **Profili studente e contratto futuro con Hub Scuola**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco viene considerato completato solo quando produce un sottosistema coerente, documentato e verificabile.
@@ -50,20 +50,20 @@ Non-obiettivi:
 
 ## v0.3 — Generazione controllata
 
-- definire famiglie di esercizi parametrizzate;
-- separare contenuto, difficoltà e grado di guida;
-- introdurre vincoli anti-ripetizione;
-- generare esempi, pratica, verifica e recupero dallo stesso nodo di competenza;
-- testare coerenza delle soluzioni e appropriatezza per classe.
+- [x] definire famiglie di esercizi parametrizzate;
+- [x] separare contenuto, difficoltà e grado di guida;
+- [x] introdurre vincoli anti-ripetizione;
+- [x] generare esempi, pratica, verifica e recupero dallo stesso nodo di competenza;
+- [x] testare coerenza delle soluzioni e appropriatezza per classe sui vertical slice iniziali.
 
 ## v0.4 — Adattamento
 
-- modello di sessione;
-- modello di risultato;
-- storico sintetico delle evidenze;
-- decision engine iniziale;
-- scelta tra recover, consolidate, advance, extend e reassess;
-- simulazioni con profili fittizi longitudinali.
+- [x] modello di sessione;
+- [x] modello di risultato;
+- [x] storico sintetico delle evidenze;
+- [x] decision engine iniziale;
+- [x] scelta tra recover, consolidate, advance, extend e reassess;
+- [x] simulazioni con profili fittizi longitudinali iniziali.
 
 ## v0.5 — Nuove materie
 
