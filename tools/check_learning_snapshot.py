@@ -56,7 +56,7 @@ def main():
     new=[task["fingerprint"] for phase in repeated["session"]["phases"] for task in phase.get("tasks",[])]
     if any(fp in old for fp in new): errors.append("history did not force fresh task fingerprints")
 
-    unsupported=dispatch("math.numbers.ratios","reassess","math.numbers.ratios",seed=4)
+    unsupported=dispatch("math.numbers.signed-number-sense","reassess","math.numbers.signed-number-sense",seed=4)
     if unsupported["status"]!="needs_review": errors.append("generation capability boundary missing")
 
     eng=english_case(); eplan,esent=build(eng,"english","eng.grammar.present_simple",44)
