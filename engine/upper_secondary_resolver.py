@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from engine.school_year import is_effective, start_year
+
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "curriculum" / "upper-secondary" / "pathways" / "catalog.seed.json"
 
@@ -19,11 +21,19 @@ def get_profile(profile_id):
 
 
 def validate_context(context):
+    if context.get("school_stage") != "upper_secondary":
+        return ["wrong_school_stage"]
     try:
         profile = get_profile(context.get("pathway_profile_id"))
     except ValueError:
         return ["unknown_pathway_profile"]
+    try:
+        start_year(context.get("school_year"))
+    except ValueError:
+        return ["invalid_school_year"]
     errors = []
+    if not is_effective(profile, context["school_year"]):
+        errors.append("pathway_not_effective_for_school_year")
     year = int(context.get("stage_year", 0) or 0)
     if not 1 <= year <= int(profile["duration_years"]):
         errors.append("stage_year_exceeds_pathway_duration")
@@ -59,10 +69,11 @@ def curriculum_nodes(subject, context):
         raise ValueError(",".join(errors))
     profile = get_profile(context["pathway_profile_id"])
     max_year = int(context["stage_year"])
+    school_year = context["school_year"]
     result, seen = [], set()
     for path in graph_files(subject):
         graph = json.loads(path.read_text(encoding="utf-8"))
-        if not _layer_matches(graph.get("layer", {}), profile):
+        if not is_effective(graph, school_year) or not _layer_matches(graph.get("layer", {}), profile):
             continue
         for order, node in enumerate(graph.get("nodes", [])):
             if int(node.get("stage_year", 0)) > max_year or not _node_matches(node, profile):
@@ -79,10 +90,14 @@ def curriculum_nodes(subject, context):
 
 
 def curriculum_profiles(subject, context):
+    errors = validate_context(context)
+    if errors:
+        raise ValueError(",".join(errors))
     profile = get_profile(context["pathway_profile_id"])
+    school_year = context["school_year"]
     rows = []
     for path in graph_files(subject):
         graph = json.loads(path.read_text(encoding="utf-8"))
-        if _layer_matches(graph.get("layer", {}), profile):
+        if is_effective(graph, school_year) and _layer_matches(graph.get("layer", {}), profile):
             rows.append(graph["curriculum_profile"])
     return rows
