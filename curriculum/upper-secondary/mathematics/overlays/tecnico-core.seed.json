@@ -1,0 +1,31 @@
+{
+  "version": "0.1.0",
+  "subject": "mathematics",
+  "school_stage": "upper_secondary",
+  "curriculum_profile": "it-upper-math-tecnico-core-seed-2026",
+  "effective_from_school_year": "2026/27",
+  "effective_to_school_year": null,
+  "sequencing_note": "Overlay architetturale di prova per i percorsi tecnici; non è ancora il curriculum completo v0.8.",
+  "layer": {
+    "kind": "family_core",
+    "family": "tecnico",
+    "profile_ids": [],
+    "notes": "Dimostra la composizione common core + family core."
+  },
+  "nodes": [
+    {
+      "id": "math.us.gateway.technical-modelling",
+      "title": "Modellizzazione quantitativa in contesto tecnico",
+      "strand": "mathematical_practices",
+      "stage_year": 1,
+      "priority": "supporting",
+      "prerequisites": ["math.us.gateway.representations-modelling"],
+      "objectives": ["Interpretare grandezze e relazioni in un contesto tecnico accessibile", "Esplicitare ipotesi e unità invece di trattare soltanto simboli"],
+      "mastery_evidence": ["Costruisce una rappresentazione quantitativa coerente con il contesto", "Controlla unità e plausibilità del risultato"],
+      "diagnostic_signals": ["Formula priva di significato nel contesto", "Unità ignorate", "Risultato non controllato"],
+      "difficulty_levers": ["modelling", "information_load", "precision_demand"],
+      "applies_to_profile_ids": [],
+      "excludes_profile_ids": []
+    }
+  ]
+}
