@@ -1,0 +1,72 @@
+{
+  "version": "0.1.0",
+  "subject": "english",
+  "school_stage": "upper_secondary",
+  "curriculum_profile": "it-upper-english-gateway-2026",
+  "effective_from_school_year": "2026/27",
+  "effective_to_school_year": null,
+  "sequencing_note": "Gateway architetturali tra A2 della scuola media e il successivo sviluppo verso B1/B2. Non costituiscono il curriculum completo v0.8.",
+  "layer": {
+    "kind": "common_core",
+    "family": null,
+    "profile_ids": [],
+    "notes": "Layer comune usato per verificare continuità verticale e composizione tra profili."
+  },
+  "nodes": [
+    {
+      "id": "eng.us.gateway.a2-integrated-control",
+      "title": "Controllo integrato A2 in ingresso",
+      "strand": "integrated_language_use",
+      "stage_year": 1,
+      "priority": "gateway",
+      "prerequisites": [
+        "eng.grammar.present_perfect_vs_past",
+        "eng.grammar.connectors_cohesion",
+        "eng.phonology.connected_speech"
+      ],
+      "objectives": [
+        "Usare risorse A2 già apprese per comprendere e produrre messaggi collegati, non soltanto frasi isolate",
+        "Rilevare se una difficoltà del biennio deriva da controllo grammaticale, coesione o riconoscimento del parlato"
+      ],
+      "mastery_evidence": [
+        "Comprende e produce un breve messaggio coerente usando più risorse A2 insieme",
+        "Mantiene il significato anche quando forma e modalità cambiano"
+      ],
+      "diagnostic_signals": [
+        "Conoscenze grammaticali isolate ma non disponibili nell'uso",
+        "Testo composto da frasi scollegate",
+        "Comprensione scritta nettamente superiore al riconoscimento nel parlato"
+      ],
+      "difficulty_levers": ["language_demand", "discourse_span", "productive_freedom", "representation_demand"],
+      "applies_to_profile_ids": [],
+      "excludes_profile_ids": [],
+      "notes": "Nodo gateway comune. La progressione B1/B2 sarà definita nel curriculum v0.8."
+    },
+    {
+      "id": "eng.us.gateway.a2-autonomy",
+      "title": "Autonomia strategica oltre l'A2",
+      "strand": "learning_strategy",
+      "stage_year": 1,
+      "priority": "gateway",
+      "prerequisites": [
+        "eng.us.gateway.a2-integrated-control"
+      ],
+      "objectives": [
+        "Affrontare input leggermente più complessi senza ricorrere automaticamente alla traduzione parola per parola",
+        "Scegliere strategie diverse per gist, dettaglio, produzione e riparazione comunicativa"
+      ],
+      "mastery_evidence": [
+        "Prosegue il compito anche in presenza di elementi non noti",
+        "Sa spiegare quale strategia ha usato e quando la cambierebbe"
+      ],
+      "diagnostic_signals": [
+        "Abbandono dopo una parola sconosciuta",
+        "Strategia unica applicata a ogni compito",
+        "Dipendenza costante dal supporto"
+      ],
+      "difficulty_levers": ["transfer_distance", "language_demand", "strategy_selection", "support_fading"],
+      "applies_to_profile_ids": [],
+      "excludes_profile_ids": []
+    }
+  ]
+}

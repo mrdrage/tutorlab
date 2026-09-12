@@ -19,6 +19,11 @@ CHECKS = (
     "tools/check_full_triennium_generation_coverage.py",
     "tools/check_language_expansion.py",
     "tools/run_longitudinal_simulations.py",
+    "tools/check_upper_secondary_schemas.py",
+    "tools/check_upper_secondary_architecture.py",
+    "tools/check_upper_secondary_legacy_compat.py",
+    "tools/check_upper_secondary_capability_boundary.py",
+    "tools/check_cross_stage_recovery_bridge.py",
 )
 
 

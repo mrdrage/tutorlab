@@ -13,7 +13,7 @@
 - [x] **Generation Coverage v0.4: intera 3ª media eseguibile + triennio completo Matematica e Inglese**
 - [x] **Reliability v0.5: simulazioni longitudinali + calibrazione mastery**
 - [x] **Language Expansion v0.6: Italiano + Francese + Spagnolo, triennio completo**
-- [ ] **Upper Secondary Architecture v0.7: struttura 1ª-5ª superiore e indirizzi**
+- [x] **Upper Secondary Architecture v0.7: modello dati, percorsi, layer e ponti medie → superiori**
 - [ ] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
 - [ ] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
 
@@ -92,16 +92,25 @@ Obiettivo: dimostrare che l'architettura di TutorLab regge una lingua madre e du
 
 ## v0.7 — Upper Secondary Architecture
 
-Prima di estendere i contenuti, TutorLab deve rappresentare correttamente la secondaria di secondo grado.
+Obiettivo: rappresentare correttamente la secondaria di secondo grado prima di estendere i contenuti.
 
-- [ ] introdurre `upper_secondary` come school stage mantenendo compatibilità con `middle_school`;
-- [ ] modellare anni 1ª-5ª;
-- [ ] modellare indirizzo/percorso scolastico senza assumere un unico programma nazionale identico per tutti;
-- [ ] distinguere core comune, competenze trasversali e nodi specifici dell'indirizzo;
-- [ ] versionare i profili curricolari e le fonti normative;
-- [ ] definire prerequisiti verticali medie → superiori;
-- [ ] estendere Learning Snapshot, target selector e capability registry al nuovo stage;
-- [ ] aggiungere test locali di compatibilità retroattiva con l'intero triennio delle medie.
+- [x] modello dati separato in `academic_context`, `education_pathway` e `curriculum_graph`;
+- [x] `upper_secondary` come school stage mantenendo compatibilità con `middle_school`;
+- [x] anni 1ª-5ª senza assumere che ogni percorso duri cinque anni;
+- [x] percorsi standard e quadriennali tramite `duration_years` e `pathway_variant`;
+- [x] licei, tecnici e professionali con indirizzo, articolazione, opzione/specializzazione quando pertinenti;
+- [x] profili e fonti versionati per anno scolastico e stato di transizione;
+- [x] curriculum componibile per layer: common core → family core → indirizzo → articolazione → opzione → profile;
+- [x] namespace superiore `<subject>.us.*`;
+- [x] prerequisiti verticali medie → superiori tramite gateway Math/English;
+- [x] Learning Snapshot 0.2 con `academic_context` opzionale e compatibilità con snapshot 0.1;
+- [x] target selector stage-aware con fallback legacy invariato;
+- [x] resolver di profilo/layer con controllo di durata, variante e deduplicazione;
+- [x] capability boundary esplicito: i nodi superiori restano `needs_review` finché v0.8 non aggiunge generation coverage;
+- [x] test locali per schema, composizione dei layer, quadriennali, prerequisiti verticali e retrocompatibilità;
+- [x] nessun GitHub Actions/Workflow.
+
+Il catalogo dei percorsi in v0.7 è un seed architetturale rappresentativo, non l'elenco territoriale esaustivo di ogni opzione attivata dalle singole scuole. La v0.8 aggiungerà i profili necessari ai curriculum Math/English senza duplicare il common core.
 
 ## v0.8 — Matematica + Inglese 1ª-5ª superiore
 
@@ -110,6 +119,7 @@ Prima di estendere i contenuti, TutorLab deve rappresentare correttamente la sec
 - [ ] generation coverage completa;
 - [ ] mastery rubric e Difficulty Engine calibrati per il nuovo stage;
 - [ ] vertical slice completi per biennio e triennio;
+- [ ] capability registry superiore attivata soltanto per nodi realmente generabili;
 - [ ] validazione locale senza workflow a pagamento.
 
 La realizzazione potrà essere divisa internamente in due grandi sotto-blocchi, 1ª-2ª e 3ª-5ª, ma la copertura finale deve restare un unico percorso verticale interrogabile dal motore.

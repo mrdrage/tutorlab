@@ -4,10 +4,50 @@
   "type":"object",
   "required":["version","subjects","recent_activity"],
   "properties":{
-    "version":{"const":"0.1"},
-    "subjects":{"type":"object","additionalProperties":{"type":"object","required":["typical_year","competency_states","evidence_events","objective_stack"],"properties":{"typical_year":{"type":"integer","minimum":1,"maximum":3},"competency_states":{"type":"object","additionalProperties":{"type":"object"}},"evidence_events":{"type":"array","items":{"type":"object"},"maxItems":500},"objective_stack":{"type":["object","null"]},"last_recommendation":{"type":["object","null"]}},"additionalProperties":false}},
+    "version":{"enum":["0.1","0.2"]},
+    "academic_context":{
+      "type":"object",
+      "required":["school_stage","stage_year","school_year"],
+      "properties":{
+        "school_stage":{"enum":["middle_school","upper_secondary"]},
+        "stage_year":{"type":"integer","minimum":1,"maximum":5},
+        "school_year":{"type":"string","pattern":"^[0-9]{4}/[0-9]{2}$"},
+        "pathway_profile_id":{"type":["string","null"]},
+        "pathway_variant":{"type":["string","null"]},
+        "curriculum_profile_ids":{"type":"array","uniqueItems":true,"items":{"type":"string"}}
+      },
+      "allOf":[
+        {
+          "if":{"properties":{"school_stage":{"const":"middle_school"}},"required":["school_stage"]},
+          "then":{"properties":{"stage_year":{"maximum":3},"pathway_profile_id":{"type":"null"},"pathway_variant":{"type":"null"}}}
+        },
+        {
+          "if":{"properties":{"school_stage":{"const":"upper_secondary"}},"required":["school_stage"]},
+          "then":{"required":["pathway_profile_id","pathway_variant"],"properties":{"pathway_profile_id":{"type":"string","pattern":"^it\\.upper\\.[a-z0-9._-]+$"},"pathway_variant":{"type":"string","enum":["standard","quadriennale_filiera","quadriennale_sperimentale","other_experimental"]}}}
+        }
+      ],
+      "additionalProperties":false
+    },
+    "subjects":{"type":"object","additionalProperties":{"type":"object","required":["typical_year","competency_states","evidence_events","objective_stack"],"properties":{"typical_year":{"type":"integer","minimum":1,"maximum":5},"competency_states":{"type":"object","additionalProperties":{"type":"object"}},"evidence_events":{"type":"array","items":{"type":"object"},"maxItems":500},"objective_stack":{"type":["object","null"]},"last_recommendation":{"type":["object","null"]}},"additionalProperties":false}},
     "recent_activity":{"type":"object","required":["session_ids","fingerprints"],"properties":{"session_ids":{"type":"array","items":{"type":"string"}},"fingerprints":{"type":"array","items":{"type":"string"}}},"additionalProperties":false},
     "preferences":{"type":"object"}
   },
+  "allOf":[
+    {
+      "if":{"properties":{"version":{"const":"0.1"}},"required":["version"]},
+      "then":{
+        "not":{"required":["academic_context"]},
+        "properties":{"subjects":{"additionalProperties":{"properties":{"typical_year":{"maximum":3}}}}}
+      }
+    },
+    {
+      "if":{"properties":{"version":{"const":"0.2"}},"required":["version"]},
+      "then":{"required":["academic_context"]}
+    },
+    {
+      "if":{"properties":{"academic_context":{"properties":{"school_stage":{"const":"middle_school"}},"required":["school_stage"]}},"required":["academic_context"]},
+      "then":{"properties":{"subjects":{"additionalProperties":{"properties":{"typical_year":{"maximum":3}}}}}
+    }
+  ],
   "additionalProperties":false
 }
