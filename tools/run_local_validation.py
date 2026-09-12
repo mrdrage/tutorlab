@@ -23,6 +23,7 @@ CHECKS = (
     "tools/check_upper_secondary_architecture.py",
     "tools/check_upper_secondary_legacy_compat.py",
     "tools/check_upper_secondary_capability_boundary.py",
+    "tools/check_cross_stage_recovery_bridge.py",
 )
 
 
