@@ -32,7 +32,13 @@
     },
     {
       "if": {"properties": {"school_stage": {"const": "upper_secondary"}}, "required": ["school_stage"]},
-      "then": {"required": ["pathway_profile_id", "pathway_variant"]}
+      "then": {
+        "required": ["pathway_profile_id", "pathway_variant"],
+        "properties": {
+          "pathway_profile_id": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"},
+          "pathway_variant": {"type": "string", "enum": ["standard", "quadriennale_filiera", "quadriennale_sperimentale", "other_experimental"]}
+        }
+      }
     }
   ]
 }
