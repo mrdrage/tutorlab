@@ -35,7 +35,23 @@
           "items": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"}
         },
         "notes": {"type": "string"}
-      }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "family_core"}}, "required": ["kind"]},
+          "then": {
+            "required": ["family"],
+            "properties": {"family": {"type": "string", "enum": ["liceo", "tecnico", "professionale"]}}
+          }
+        },
+        {
+          "if": {"properties": {"kind": {"enum": ["indirizzo", "articolazione", "opzione", "profile"]}}, "required": ["kind"]},
+          "then": {
+            "required": ["profile_ids"],
+            "properties": {"profile_ids": {"type": "array", "minItems": 1}}
+          }
+        }
+      ]
     },
     "node": {
       "type": "object",
