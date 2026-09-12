@@ -15,11 +15,7 @@
     "effective_to_school_year": {"type": ["string", "null"], "pattern": "^[0-9]{4}/[0-9]{2}$"},
     "sequencing_note": {"type": "string"},
     "layer": {"$ref": "#/$defs/layer"},
-    "nodes": {
-      "type": "array",
-      "minItems": 1,
-      "items": {"$ref": "#/$defs/node"}
-    }
+    "nodes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/node"}}
   },
   "$defs": {
     "layer": {
@@ -29,27 +25,17 @@
       "properties": {
         "kind": {"type": "string", "enum": ["common_core", "family_core", "indirizzo", "articolazione", "opzione", "profile"]},
         "family": {"type": ["string", "null"], "enum": [null, "liceo", "tecnico", "professionale"]},
-        "profile_ids": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"}
-        },
+        "profile_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"}},
         "notes": {"type": "string"}
       },
       "allOf": [
         {
           "if": {"properties": {"kind": {"const": "family_core"}}, "required": ["kind"]},
-          "then": {
-            "required": ["family"],
-            "properties": {"family": {"type": "string", "enum": ["liceo", "tecnico", "professionale"]}}
-          }
+          "then": {"required": ["family"], "properties": {"family": {"type": "string", "enum": ["liceo", "tecnico", "professionale"]}}}
         },
         {
           "if": {"properties": {"kind": {"enum": ["indirizzo", "articolazione", "opzione", "profile"]}}, "required": ["kind"]},
-          "then": {
-            "required": ["profile_ids"],
-            "properties": {"profile_ids": {"type": "array", "minItems": 1}}
-          }
+          "then": {"required": ["profile_ids"], "properties": {"profile_ids": {"type": "array", "minItems": 1}}}
         }
       ]
     },
@@ -63,27 +49,25 @@
         "strand": {"type": "string", "minLength": 1},
         "stage_year": {"type": "integer", "minimum": 1, "maximum": 5},
         "priority": {"type": "string", "enum": ["gateway", "core", "supporting", "extension"]},
-        "prerequisites": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*\\.[a-z0-9._-]+$"}
-        },
+        "prerequisites": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*\\.[a-z0-9._-]+$"}},
         "objectives": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
         "mastery_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
         "diagnostic_signals": {"type": "array", "items": {"type": "string"}},
         "difficulty_levers": {"type": "array", "items": {"type": "string"}},
-        "applies_to_profile_ids": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"}
-        },
-        "excludes_profile_ids": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"}
-        },
+        "cefr_anchor": {"type": "string", "enum": ["A2", "B1", "B2"]},
+        "progression_stage": {"type": "string", "enum": ["A2_bridge", "B1_developing", "B1_core", "B1_plus", "B2_developing", "B2_target", "B2_extension"]},
+        "communicative_functions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "contexts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "applies_to_profile_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"}},
+        "excludes_profile_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^it\\.upper\\.[a-z0-9._-]+$"}},
         "notes": {"type": "string"}
-      }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"id": {"pattern": "^eng\\.us\\."}}, "required": ["id"]},
+          "then": {"required": ["cefr_anchor", "progression_stage"]}
+        }
+      ]
     }
   }
 }
