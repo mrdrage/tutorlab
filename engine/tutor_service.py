@@ -39,11 +39,11 @@ def _validate_request(request: dict[str, Any]) -> None:
 
 
 def _requested_action(intent: str, adaptive_action: str, selection_reason: str) -> str:
+    if intent == "assessment":
+        return "reassess"
     if selection_reason == "known_prerequisite_gap":
         return "recover"
     if selection_reason == "prerequisite_needs_evidence":
-        return "reassess"
-    if intent == "assessment":
         return "reassess"
     if intent == "practice" and adaptive_action in {"advance", "extend"}:
         return "consolidate"
