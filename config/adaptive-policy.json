@@ -1,5 +1,5 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "max_recovery_depth": 2,
   "min_decision_confidence": 0.55,
   "min_events_secure": 3,
@@ -7,6 +7,7 @@
   "min_independent_for_recovery_exit": 1,
   "contradiction_threshold": 0.7,
   "contradiction_window": 8,
+  "mastery_evidence_window": 12,
   "hypothesis_clean_success_decay": 0.65,
   "post_recovery_reassess": true,
   "advance": {
@@ -51,5 +52,5 @@
     "worked_support": 0.45,
     "direct_solution": 0.1
   },
-  "note": "Default operativi calibrati su simulazioni longitudinali sintetiche. Non sono soglie cliniche, psicometriche o una validazione su studenti reali."
+  "note": "Default operativi calibrati su simulazioni longitudinali sintetiche. La mastery usa una finestra recente di evidenze senza eliminare lo storico grezzo dal Learning Snapshot. Non sono soglie cliniche, psicometriche o una validazione su studenti reali."
 }

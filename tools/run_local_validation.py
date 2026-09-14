@@ -19,6 +19,7 @@ CHECKS = (
     "tools/check_full_triennium_generation_coverage.py",
     "tools/check_language_expansion.py",
     "tools/run_longitudinal_simulations.py",
+    "tools/check_mastery_evidence_window.py",
     "tools/check_upper_secondary_schemas.py",
     "tools/check_upper_secondary_architecture.py",
     "tools/check_upper_secondary_legacy_compat.py",
@@ -28,6 +29,8 @@ CHECKS = (
     "tools/check_upper_secondary_generation_quality.py",
     "tools/check_upper_secondary_generator_alignment.py",
     "tools/check_upper_secondary_vertical_slices.py",
+    "tools/run_longitudinal_8y.py",
+    "tools/calibrate_longitudinal_8y.py",
 )
 
 

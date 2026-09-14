@@ -37,15 +37,18 @@ def _alternation_score(raw_success: list[float], window: int) -> float:
 
 
 def calibrated_state(competency_id: str, events: list[dict[str, Any]], policy: dict[str, Any]) -> dict[str, Any]:
-    state = deepcopy(aggregate_competency_state(competency_id, events, policy))
-    relevant = [event for event in events if event.get("competency_id") == competency_id]
-    relevant.sort(key=lambda event: event.get("observed_at", ""))
+    lifetime = [event for event in events if event.get("competency_id") == competency_id]
+    lifetime.sort(key=lambda event: event.get("observed_at", ""))
+
+    window = int(policy.get("mastery_evidence_window", 0) or 0)
+    active = lifetime[-window:] if window and len(lifetime) > window else lifetime
+    state = deepcopy(aggregate_competency_state(competency_id, active, policy))
 
     decay = float(policy.get("hypothesis_clean_success_decay", 0.65))
     hypotheses = []
     for item in state.get("error_hypotheses", []):
         adjusted = dict(item)
-        against = _later_clean_successes(relevant, list(item.get("evidence_for", [])))
+        against = _later_clean_successes(active, list(item.get("evidence_for", [])))
         adjusted["evidence_against"] = against[-6:]
         adjusted["confidence"] = round(_clamp(float(item.get("confidence", 0.0)) * (decay ** len(against))), 4)
         hypotheses.append(adjusted)
@@ -53,7 +56,7 @@ def calibrated_state(competency_id: str, events: list[dict[str, Any]], policy: d
 
     raw_success = [
         OUTCOME_VALUE[event.get("outcome", {}).get("status")]
-        for event in relevant
+        for event in active
         if event.get("outcome", {}).get("status") in OUTCOME_VALUE
     ]
     alternation = _alternation_score(raw_success, int(policy.get("contradiction_window", 8)))
@@ -63,5 +66,7 @@ def calibrated_state(competency_id: str, events: list[dict[str, Any]], policy: d
     state["error_hypotheses"] = hypotheses
     summary = dict(state.get("evidence_summary", {}))
     summary["contradiction_level"] = round(_clamp(alternation * (1 - 0.65 * strongest)), 4)
+    summary["lifetime_event_count"] = len(lifetime)
+    summary["active_window_event_count"] = len(active)
     state["evidence_summary"] = summary
     return state
