@@ -111,6 +111,14 @@ def main() -> int:
         if completed["next_step"]["action"] not in {"recover", "consolidate", "advance", "extend", "reassess", "return_to"}:
             failures.append(f"invalid next step from complete(): {completed['next_step']}")
 
+        mismatch = scored_result(package["session"])
+        mismatch["session_id"] = "different-session"
+        try:
+            complete_tutor_session(math, package, mismatch, policy=POLICY)
+            failures.append("complete() accepted a result for a different session")
+        except ValueError:
+            pass
+
     eng = english_case()
     practice = prepare_tutor_package(eng, {
         "version": "1.0-rc1",
@@ -181,23 +189,23 @@ def main() -> int:
     if review["status"] != "needs_review" or review["session"] is not None:
         failures.append("capability boundary not preserved by tutor orchestrator")
 
-    strong_state = {
+    advance_state = {
         "competency_id": "math.numbers.fraction-meaning",
         "status": "secure",
-        "confidence": 0.92,
-        "mastery": {"accuracy": 0.94, "independence": 0.90, "stability": 0.88, "transfer": 0.82},
-        "evidence_summary": {"independent_event_count": 4, "transfer_event_count": 2, "contradiction_level": 0.0},
+        "confidence": 0.86,
+        "mastery": {"accuracy": 0.84, "independence": 0.76, "stability": 0.72, "transfer": 0.56},
+        "evidence_summary": {"independent_event_count": 3, "transfer_event_count": 1, "contradiction_level": 0.0},
         "error_hypotheses": [],
     }
     advance = resolve(
         {"root_target_id": "math.numbers.fraction-meaning", "working_target_id": "math.numbers.fraction-meaning", "reason": "fixture"},
         start_objective("math.numbers.fraction-meaning"),
-        strong_state,
+        advance_state,
         "math.numbers.fraction-equivalence",
         POLICY,
     )
     if advance.get("kind") != "advance":
-        failures.append(f"strong state did not produce advance fixture: {advance.get('kind')}")
+        failures.append(f"advance-band state did not produce advance fixture: {advance.get('kind')}")
     elif advance["stack"]["root_target_id"] != "math.numbers.fraction-equivalence":
         failures.append("advance plan kept stale objective stack root")
 
@@ -212,6 +220,7 @@ def main() -> int:
     print("Upper-secondary facade: OK")
     print("Student-view leakage guard: OK")
     print("Prepare -> complete transition: OK")
+    print("Session-result identity guard: OK")
     return 0
 
 
