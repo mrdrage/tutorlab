@@ -224,15 +224,25 @@ def complete_tutor_session(
 ) -> dict[str, Any]:
     if package.get("status") != "ok" or not package.get("session"):
         raise ValueError("cannot complete a package without an executable session")
-    policy = policy or load_policy()
+    if package.get("version") != "1.0-rc1":
+        raise ValueError("unsupported tutor package version")
+
+    session = package["session"]
+    if result.get("session_id") != session.get("session_id"):
+        raise ValueError("session result does not match tutor package")
+
     subject = package["request"]["subject"]
+    if session.get("subject") != subject:
+        raise ValueError("session subject does not match tutor package")
+
+    policy = policy or load_policy()
     planned_snapshot = apply_plan_patch(snapshot, package)
-    moved = transition(planned_snapshot, subject, package["session"], result, policy)
+    moved = transition(planned_snapshot, subject, session, result, policy)
     next_step = moved["next_step"]
     return {
         "version": "1.0-rc1",
         "subject": subject,
-        "session_id": package["session"]["session_id"],
+        "session_id": session["session_id"],
         "snapshot_update": moved["snapshot_update"],
         "next_step": next_step,
         "pending_task_ids": moved["pending_task_ids"],
