@@ -8,14 +8,14 @@ from typing import Any
 from engine.learning_snapshot import competency_state, with_objective_stack
 from engine.path_selector import select_target, suggested_successor
 from engine.decision_bridge import route
-from engine.session_dispatch import dispatch
 from engine.stack_bridge import ensure_stack
 from engine.result_transition import transition
-from engine.session_engine import student_view
+from engine.session_engine import build_session, student_view
+from engine.task_families import can_generate
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "adaptive-policy.json"
-
+DEFAULT_BANDS={"recover":1,"consolidate":2,"advance":2,"extend":4,"reassess":2}
 ALLOWED_INTENTS = {"continue", "lesson", "practice", "assessment"}
 
 
@@ -36,6 +36,9 @@ def _validate_request(request: dict[str, Any]) -> None:
     band = request.get("max_challenge_band")
     if band is not None and not 1 <= int(band) <= 5:
         raise ValueError("max_challenge_band outside supported range")
+    quantity = request.get("quantity_hint")
+    if quantity is not None and not 1 <= int(quantity) <= 30:
+        raise ValueError("quantity_hint outside supported range")
 
 
 def _requested_action(intent: str, adaptive_action: str, selection_reason: str) -> str:
@@ -48,6 +51,22 @@ def _requested_action(intent: str, adaptive_action: str, selection_reason: str) 
     if intent == "practice" and adaptive_action in {"advance", "extend"}:
         return "consolidate"
     return adaptive_action
+
+
+def _generate(working_target: str, action: str, root_target: str, *, seed: int, duration: int, max_band: int, quantity_hint: int | None, history: list[str]):
+    if not can_generate(working_target):
+        return {"status":"needs_review","warning":f"task_family_not_available:{working_target}","session":None}
+    session=build_session(
+        working_target,
+        action,
+        original_target_id=root_target,
+        challenge_band=min(DEFAULT_BANDS[action],max_band),
+        duration_minutes=duration,
+        quantity_hint=quantity_hint,
+        seed=seed,
+        history_fingerprints=history,
+    )
+    return {"status":"ok","warning":None,"session":session}
 
 
 def plan(snapshot: dict[str, Any], request: dict[str, Any], *, seed: int = 1) -> dict[str, Any]:
@@ -76,16 +95,18 @@ def plan(snapshot: dict[str, Any], request: dict[str, Any], *, seed: int = 1) ->
     preferences = snapshot.get("preferences", {})
     duration = int(request.get("duration_minutes") or preferences.get("default_duration_minutes", 40))
     max_band = int(request.get("max_challenge_band") or preferences.get("max_challenge_band", 5))
+    quantity_hint = int(request["quantity_hint"]) if request.get("quantity_hint") is not None else None
     history = list(snapshot.get("recent_activity", {}).get("fingerprints", []))
 
-    generated = dispatch(
+    generated = _generate(
         working_target,
         action,
         selection["root_target_id"],
         seed=seed,
-        duration_minutes=duration,
-        max_challenge_band=max_band,
-        history_fingerprints=history,
+        duration=duration,
+        max_band=max_band,
+        quantity_hint=quantity_hint,
+        history=history,
     )
     if generated["status"] != "ok":
         return {
