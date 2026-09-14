@@ -6,7 +6,7 @@
   "properties": {
     "version": {"const": "0.1"},
     "session_id": {"type": "string"},
-    "subject": {"enum": ["mathematics", "english"]},
+    "subject": {"enum": ["mathematics", "english", "italian", "french", "spanish"]},
     "target_competency_id": {"type": "string"},
     "original_target_id": {"type": "string"},
     "action": {"enum": ["recover", "consolidate", "advance", "extend", "reassess"]},
