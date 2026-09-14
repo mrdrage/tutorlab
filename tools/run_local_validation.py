@@ -31,6 +31,8 @@ CHECKS = (
     "tools/check_upper_secondary_vertical_slices.py",
     "tools/run_longitudinal_8y.py",
     "tools/calibrate_longitudinal_8y.py",
+    "tools/check_tutor_contract_schemas.py",
+    "tools/check_tutor_orchestrator.py",
 )
 
 
