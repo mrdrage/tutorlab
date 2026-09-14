@@ -38,7 +38,9 @@ def main() -> int:
     original=deepcopy(snapshot)
 
     continued=plan(snapshot,{"subject":"mathematics","intent":"continue","duration_minutes":40},seed=101)
+    continued_again=plan(snapshot,{"subject":"mathematics","intent":"continue","duration_minutes":40},seed=101)
     assert continued["status"]=="ok"
+    assert continued["session"]==continued_again["session"], "fixed snapshot/request/seed must be deterministic"
     assert continued["session"]["duration_minutes"]==40
     assert continued["student_session"] is not None
     _assert_student_safe(continued["student_session"])
@@ -51,6 +53,16 @@ def main() -> int:
     assessed=plan(snapshot,{"subject":"mathematics","intent":"assessment","target_competency_id":target},seed=103)
     assert assessed["status"]=="ok"
     assert assessed["decision"]["action"]=="reassess"
+
+    gated_target="math.numbers.fraction-operations"
+    gated_practice=plan(snapshot,{"subject":"mathematics","intent":"practice","target_competency_id":gated_target},seed=105)
+    assert gated_practice["selection"]["root_target_id"]==gated_target
+    assert gated_practice["selection"]["working_target_id"]=="math.numbers.fraction-equivalence"
+    assert gated_practice["decision"]["action"]=="recover", "practice must not bypass a known prerequisite gap"
+
+    gated_assessment=plan(snapshot,{"subject":"mathematics","intent":"assessment","target_competency_id":gated_target},seed=106)
+    assert gated_assessment["selection"]["working_target_id"]=="math.numbers.fraction-equivalence"
+    assert gated_assessment["decision"]["action"]=="reassess", "assessment must test the selected prerequisite rather than bypass it"
 
     exchange={
         "version":"1.0",
