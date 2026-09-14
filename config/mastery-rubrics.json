@@ -1,5 +1,5 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "purpose": "Evidence sufficiency gates calibrated with synthetic longitudinal simulations. These are engineering defaults, not psychometric cut scores.",
   "families": {
     "math_procedural": {
@@ -111,6 +111,20 @@
       "prefixes": ["fr.learning.", "fr.intercultural.", "fr.integrated.", "es.learning.", "es.intercultural.", "es.integrated."],
       "priority_dimensions": ["independence", "transfer", "explanation"],
       "min_independent_events": 2,
+      "min_transfer_events": 2,
+      "extend_transfer_events": 3
+    },
+    "upper_math": {
+      "prefixes": ["math.us."],
+      "priority_dimensions": ["accuracy", "independence", "transfer", "explanation", "stability"],
+      "min_independent_events": 3,
+      "min_transfer_events": 2,
+      "extend_transfer_events": 3
+    },
+    "upper_english": {
+      "prefixes": ["eng.us."],
+      "priority_dimensions": ["independence", "transfer", "accuracy", "stability", "explanation"],
+      "min_independent_events": 3,
       "min_transfer_events": 2,
       "extend_transfer_events": 3
     }
