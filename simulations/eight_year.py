@@ -23,6 +23,14 @@ def _support(action: str, dependence: float, item: int) -> str:
     return ("structured_prompt", "light_prompt", "none", "none", "none", "none")[item % 6]
 
 
+def recovery_depth_hint(competency_id: str, profile: EightYearProfile) -> int:
+    if competency_id == profile.deep_gap_prerequisite:
+        return 2
+    if competency_id == profile.gap_prerequisite:
+        return 1
+    return 0
+
+
 def _event(
     profile: EightYearProfile,
     competency_id: str,
@@ -77,14 +85,6 @@ def _event(
     }
 
 
-def recovery_depth_hint(competency_id: str, profile: EightYearProfile) -> int:
-    if competency_id == profile.deep_gap_prerequisite:
-        return 2
-    if competency_id == profile.gap_prerequisite:
-        return 1
-    return 0
-
-
 def _child_gap(profile: EightYearProfile, stage_number: int, competency_id: str, resolved: set[str]) -> str | None:
     if profile.gap_stage != stage_number:
         return None
@@ -95,7 +95,7 @@ def _child_gap(profile: EightYearProfile, stage_number: int, competency_id: str,
     return None
 
 
-def _oracle_root(profile: EightYearProfile, stage_number: int, skill: float, unresolved_gap: bool) -> str:
+def _oracle_root(profile: EightYearProfile, skill: float, unresolved_gap: bool) -> str:
     if unresolved_gap:
         return "recover"
     if profile.profile_kind == "support_dependent":
@@ -121,7 +121,7 @@ def run_profile_8y(
     policy: dict[str, Any],
     *,
     seed: int,
-    max_sessions_per_stage: int = 8,
+    max_sessions_per_stage: int = 16,
 ) -> dict[str, Any]:
     rng = random.Random(seed)
     events: list[dict[str, Any]] = []
@@ -151,7 +151,11 @@ def run_profile_8y(
         root_skill = _clamp(profile.initial_skill + profile.yearly_gain * stage_index)
         if profile.gap_stage == stage_number and profile.gap_prerequisite not in resolved:
             root_skill = min(root_skill, 0.48)
-        skills = {root_target: root_skill, **gap_skills}
+        skills = {root_target: root_skill}
+        if profile.gap_stage == stage_number:
+            skills.update(gap_skills)
+            skills[root_target] = root_skill
+
         stack = start_objective(root_target)
         action = "reassess"
         consecutive_reassess = 0
@@ -199,7 +203,7 @@ def run_profile_8y(
                 consecutive_reassess = 0
 
             unresolved_root_gap = _child_gap(profile, stage_number, root_target, resolved) is not None
-            expected = _oracle_root(profile, stage_number, skills[root_target], unresolved_root_gap)
+            expected = _oracle_root(profile, skills[root_target], unresolved_root_gap)
             if depth == 0 and decision in {"advance", "extend"} and expected not in {"advance", "extend"}:
                 metrics["premature_advance"] += 1
             if depth == 0 and decision == "recover" and not unresolved_root_gap:
@@ -278,7 +282,7 @@ def run_suite_8y(
     policy: dict[str, Any],
     *,
     seeds: int = 40,
-    max_sessions_per_stage: int = 8,
+    max_sessions_per_stage: int = 16,
 ) -> dict[str, Any]:
     runs = [
         run_profile_8y(profile, policy, seed=90_000 + seed, max_sessions_per_stage=max_sessions_per_stage)
@@ -301,6 +305,7 @@ def run_suite_8y(
         "stagnated_stage_per_run": round(sum(r["metrics"]["stagnated_stages"] for r in runs) / total, 4),
         "strong_complete_8y_rate": rate(strong, lambda r: r["completed_stages"] == 8),
         "typical_complete_8y_rate": rate(typical, lambda r: r["completed_stages"] == 8),
+        "cross_stage_complete_8y_rate": rate(gaps, lambda r: r["completed_stages"] == 8),
         "cross_stage_recovery_detect_rate": rate(gaps, lambda r: r["metrics"]["cross_stage_recovery_detected"] == 1),
         "cross_stage_return_rate": rate(gaps, lambda r: r["metrics"]["cross_stage_returned"] >= 1),
         "deep_recovery_detect_rate": rate(gaps, lambda r: r["metrics"]["deep_recovery_detected"] == 1),
