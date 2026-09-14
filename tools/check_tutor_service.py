@@ -37,9 +37,21 @@ def _all_correct_result(session):
     }
 
 
+def _must_fail(fn, message):
+    try:
+        fn()
+    except (ValueError, KeyError):
+        return
+    raise AssertionError(message)
+
+
 def main() -> int:
     snapshot=mathematics_case()
     original=deepcopy(snapshot)
+
+    _must_fail(lambda: plan(snapshot,{"subject":"physics","intent":"continue"}),"unsupported subject accepted")
+    _must_fail(lambda: plan(snapshot,{"subject":"mathematics","intent":"magic"}),"unsupported intent accepted")
+    _must_fail(lambda: plan(snapshot,{"subject":"mathematics","intent":"continue","quantity_hint":31}),"invalid quantity accepted")
 
     continued=plan(snapshot,{"subject":"mathematics","intent":"continue","duration_minutes":40},seed=101)
     continued_again=plan(snapshot,{"subject":"mathematics","intent":"continue","duration_minutes":40},seed=101)
@@ -93,11 +105,12 @@ def main() -> int:
 
     planned_snapshot=persist_planned_stack(snapshot,"mathematics",hub["plan"])
     session=hub["plan"]["session"]
+    result=_all_correct_result(session)
     roundtrip={
         "version":"1.0",
         "student_ref":exchange["student_ref"],
         "learning_snapshot":planned_snapshot,
-        "session_result":_all_correct_result(session),
+        "session_result":result,
         "metadata":{"subject":"mathematics","session":session},
     }
     transitioned=hub_transition(roundtrip)
@@ -105,6 +118,14 @@ def main() -> int:
     assert update["evidence_events"]
     assert update["snapshot_update"]["recent_activity"]["session_ids"]
     assert update["next_step"]["action"] in {"recover","consolidate","advance","extend","reassess","return_to"}
+
+    wrong_subject=deepcopy(roundtrip)
+    wrong_subject["metadata"]["subject"]="english"
+    _must_fail(lambda: hub_transition(wrong_subject),"cross-subject session transition accepted")
+
+    missing_student=deepcopy(exchange)
+    missing_student["student_ref"]={}
+    _must_fail(lambda: hub_plan(missing_student),"missing external student id accepted")
 
     assert snapshot==original, "plan/hub_plan mutated the caller snapshot"
 
