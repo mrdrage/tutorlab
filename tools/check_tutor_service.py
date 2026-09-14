@@ -8,6 +8,10 @@ from engine.tutor_service import hub_plan, hub_transition, persist_planned_stack
 from examples.learning_snapshot.synthetic_cases import mathematics_case
 
 
+def _task_count(session):
+    return sum(len(phase.get("tasks", [])) for phase in session.get("phases", []))
+
+
 def _assert_student_safe(session):
     for phase in session.get("phases", []):
         for task in phase.get("tasks", []):
@@ -49,6 +53,13 @@ def main() -> int:
     practiced=plan(snapshot,{"subject":"mathematics","intent":"practice","target_competency_id":target},seed=102)
     assert practiced["status"]=="ok"
     assert practiced["decision"]["action"] in {"recover","reassess","consolidate"}
+
+    quantity=plan(snapshot,{"subject":"mathematics","intent":"practice","target_competency_id":target,"quantity_hint":12},seed=107)
+    assert quantity["status"]=="ok"
+    assert _task_count(quantity["session"])>=12
+    assert quantity["session"]["generation"]["task_quantity_requested"]==12
+    assert quantity["session"]["generation"]["task_quantity_actual"]==_task_count(quantity["session"])
+    _assert_student_safe(quantity["student_session"])
 
     assessed=plan(snapshot,{"subject":"mathematics","intent":"assessment","target_competency_id":target},seed=103)
     assert assessed["status"]=="ok"
