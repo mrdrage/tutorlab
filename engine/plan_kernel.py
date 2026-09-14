@@ -1,5 +1,5 @@
 from engine.decision_bridge import route
-from engine.objective_stack import complete_current, current_objective, push_recovery
+from engine.objective_stack import complete_current, current_objective, push_recovery, start_objective
 
 
 def resolve(selection, stack, state, successor, policy, recovery_state=None):
@@ -22,6 +22,7 @@ def resolve(selection, stack, state, successor, policy, recovery_state=None):
         return {"kind":"session","target":choice.recovery_competency_id,"action":"recover","stack":stack,"decision":choice}
 
     if choice.action=="advance" and choice.next_competency_id and len(stack.get("frames",[]))==1:
-        return {"kind":"advance","target":choice.next_competency_id,"action":"advance","stack":stack,"decision":choice}
+        next_stack=start_objective(choice.next_competency_id)
+        return {"kind":"advance","target":choice.next_competency_id,"action":"advance","stack":next_stack,"decision":choice}
 
     return {"kind":"session","target":target,"action":choice.action,"stack":stack,"decision":choice}
