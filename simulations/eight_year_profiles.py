@@ -41,6 +41,8 @@ class EightYearProfile:
     gap_stage: int | None = None
     gap_prerequisite: str | None = None
     gap_skill: float | None = None
+    deep_gap_prerequisite: str | None = None
+    deep_gap_skill: float | None = None
     recovery_gain: float = 0.16
 
 
@@ -60,7 +62,8 @@ PROFILES_8Y = (
         profile_kind="cross_stage_gap", initial_skill=0.71, yearly_gain=0.018,
         learning_gain=0.055, transfer_offset=-0.08, volatility=0.055,
         gap_stage=4, gap_prerequisite="math.numbers.signed-operations",
-        gap_skill=0.34, recovery_gain=0.18,
+        gap_skill=0.34, deep_gap_prerequisite="math.numbers.signed-number-sense",
+        deep_gap_skill=0.42, recovery_gain=0.18,
     ),
     EightYearProfile(
         "support_dependent_math", "mathematics", MATH_SCIENTIFIC_PATH,
@@ -83,7 +86,8 @@ PROFILES_8Y = (
         profile_kind="cross_stage_gap", initial_skill=0.71, yearly_gain=0.018,
         learning_gain=0.055, transfer_offset=-0.07, volatility=0.055,
         gap_stage=4, gap_prerequisite="eng.grammar.present_perfect_vs_past",
-        gap_skill=0.36, recovery_gain=0.17,
+        gap_skill=0.36, deep_gap_prerequisite="eng.grammar.past_irregular",
+        deep_gap_skill=0.45, recovery_gain=0.17,
     ),
     EightYearProfile(
         "support_dependent_english", "english", ENGLISH_LICEO_PATH,
