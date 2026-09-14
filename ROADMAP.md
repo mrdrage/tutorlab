@@ -16,6 +16,7 @@
 - [x] **Upper Secondary Architecture v0.7: modello dati, percorsi, layer e ponti medie → superiori**
 - [x] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
 - [x] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
+- [ ] **Tutor Experience + Hub Scuola Contract v1.0**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
@@ -145,17 +146,31 @@ La copertura v0.8 è verticale e componibile: i nodi comuni non vengono clonati 
 
 Nel banco prova sintetico equivalente v0.9 la configurazione scelta ha mantenuto premature advance sotto l'1%, cross-stage detection/return al 100%, deep recovery detection/return intorno al 93%, completion dei profili tipici al 100% e guardia support-dependent al 100%. Questi numeri sono metriche ingegneristiche sintetiche, non risultati su studenti reali.
 
-## Esperienza Tutor e Hub Scuola
+## v1.0 — Tutor Experience + Hub Scuola Contract
 
-Con la copertura verticale Math/English e la reliability 8-year chiuse, il prossimo asse strategico è l'esperienza d'uso del tutor e il contratto applicativo con Hub Scuola:
+Obiettivo: rendere TutorLab consumabile da un tutor o da Hub Scuola senza accoppiare il motore didattico a UI, database o autenticazione specifici.
 
-- comandi ad alto livello, es. «preparami 40 minuti»;
-- output pronto per lezione e verifica;
-- controllo esplicito di tempo, difficoltà e quantità;
-- adapter tra storage Hub Scuola e Learning Snapshot;
-- persistenza applicativa di attività, evidenze e prossimo obiettivo;
-- TutorLab indipendente dal database e dalla UI di Hub Scuola.
+- [x] schema versionato del comando tutor (`continue`, `lesson`, `practice`, `assessment`);
+- [x] facade applicativo unico sopra target selector, Adaptive Engine, Session Engine e Transition;
+- [x] separazione Tutor View / Student View preservata dal facade;
+- [x] contratto Hub Scuola con `student_ref` opaco + Learning Snapshot;
+- [x] ownership della persistenza esplicitata: Hub Scuola salva, TutorLab decide/genera/interpreta;
+- [x] round-trip pianificazione → sessione → risultato → evidence → snapshot update → next step coperto da test;
+- [x] precedenza dei prerequisiti sui comandi di lesson/practice;
+- [x] semantica assessment: rivaluta il working target selezionato, anche quando è un prerequisito;
+- [x] test di determinismo a snapshot/request/seed fissi e immutabilità dell'input;
+- [x] schema test e integrazione nel runner locale;
+- [ ] collaudo finale dell'intero runner sul checkout del branch;
+- [ ] review/merge della PR v1.0;
+- [x] nessun GitHub Actions/Workflow.
 
-## v1.0 — TutorLab stabile
+Il contratto v1.0 definisce un boundary applicativo, non una API HTTP. Trasporto, database, autenticazione, UI e PDF sono adapter esterni e non devono contaminare il motore didattico.
 
-TutorLab 1.0 deve poter ricevere uno stato didattico, scegliere un obiettivo coerente, verificare prerequisiti, costruire una sessione, interpretare i risultati, proporre il passo successivo e motivare ogni decisione in modo verificabile dal tutor, su una copertura curricolare sufficientemente ampia e testata longitudinalmente.
+## Dopo v1.0
+
+Una volta stabilizzato il contract applicativo, i passi successivi possono essere sviluppati come adapter separati:
+
+- adapter Hub Scuola concreto sul formato dati reale;
+- UI tutor per comandi ad alto livello;
+- rendering/export di schede studente e vista tutor;
+- eventuale servizio HTTP locale o plugin, senza cambiare la logica curricolare.
