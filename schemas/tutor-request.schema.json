@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.local/schemas/tutor-request.schema.json",
+  "title": "TutorLab Tutor Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["subject", "intent"],
+  "properties": {
+    "subject": {
+      "type": "string",
+      "enum": ["mathematics", "english", "italian", "french", "spanish"]
+    },
+    "intent": {
+      "type": "string",
+      "enum": ["continue", "lesson", "practice", "assessment"]
+    },
+    "target_competency_id": {"type": ["string", "null"], "minLength": 1},
+    "duration_minutes": {"type": "integer", "minimum": 10, "maximum": 120},
+    "max_challenge_band": {"type": "integer", "minimum": 1, "maximum": 5},
+    "quantity_hint": {"type": "integer", "minimum": 1, "maximum": 30},
+    "student_view": {"type": "boolean", "default": true},
+    "notes": {"type": ["string", "null"], "maxLength": 500}
+  }
+}
