@@ -1,4 +1,5 @@
 import json
+from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,12 +20,49 @@ def subject_for_competency(competency_id):
     raise ValueError("unsupported competency")
 
 
-def load_competency(competency_id):
-    folder = subject_for_competency(competency_id)
-    base = ROOT / "curriculum" / "middle-school" / folder
+def _middle_competencies(subject):
+    base = ROOT / "curriculum" / "middle-school" / subject
+    if not base.exists():
+        return
     for year in (1, 2, 3):
-        data = json.loads((base / f"year-{year}.json").read_text(encoding="utf-8"))
+        path = base / f"year-{year}.json"
+        if not path.exists():
+            continue
+        data = json.loads(path.read_text(encoding="utf-8"))
         for node in data.get("nodes", []):
-            if node.get("id") == competency_id:
-                return node
-    raise ValueError("competency not found")
+            yield node
+
+
+def _upper_competencies(subject):
+    base = ROOT / "curriculum" / "upper-secondary" / subject
+    if not base.exists():
+        return
+    seen = set()
+    for path in sorted(base.rglob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for node in data.get("nodes", []):
+            cid = node.get("id")
+            if cid in seen:
+                raise ValueError(f"duplicate upper-secondary competency id: {cid}")
+            seen.add(cid)
+            yield node
+
+
+@lru_cache(maxsize=None)
+def _index(subject):
+    result = {}
+    for node in _middle_competencies(subject) or ():
+        result[node["id"]] = node
+    for node in _upper_competencies(subject) or ():
+        if node["id"] in result:
+            raise ValueError(f"duplicate competency id across stages: {node['id']}")
+        result[node["id"]] = node
+    return result
+
+
+def load_competency(competency_id):
+    subject = subject_for_competency(competency_id)
+    node = _index(subject).get(competency_id)
+    if node is None:
+        raise ValueError("competency not found")
+    return node
