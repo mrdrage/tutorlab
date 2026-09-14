@@ -56,9 +56,16 @@ def main() -> int:
 
     quantity=plan(snapshot,{"subject":"mathematics","intent":"practice","target_competency_id":target,"quantity_hint":12},seed=107)
     assert quantity["status"]=="ok"
-    assert _task_count(quantity["session"])>=12
-    assert quantity["session"]["generation"]["task_quantity_requested"]==12
-    assert quantity["session"]["generation"]["task_quantity_actual"]==_task_count(quantity["session"])
+    generation=quantity["session"]["generation"]
+    actual=_task_count(quantity["session"])
+    assert generation["task_quantity_requested"]==12
+    assert generation["task_quantity_actual"]==actual
+    assert actual>=generation["task_quantity_structural_minimum"]
+    assert actual<=12
+    assert generation["task_quantity_shortfall"]==12-actual
+    assert generation["task_quantity_satisfied"]==(actual>=12)
+    fingerprints=[task["fingerprint"] for phase in quantity["session"]["phases"] for task in phase.get("tasks",[])]
+    assert len(fingerprints)==len(set(fingerprints)), "quantity expansion introduced duplicate fingerprints"
     _assert_student_safe(quantity["student_session"])
 
     assessed=plan(snapshot,{"subject":"mathematics","intent":"assessment","target_competency_id":target},seed=103)
