@@ -26,6 +26,8 @@ from engine.families_math_year3_geometry_data import MATH_Y3_GEOMETRY_DATA_BUILD
 from engine.families_math_year3_numbers_algebra import MATH_Y3_NUMBERS_ALGEBRA_BUILDERS
 from engine.families_math_year3_practices import MATH_Y3_PRACTICE_BUILDERS
 from engine.families_upper_secondary import UPPER_ENGLISH_BUILDERS, UPPER_MATH_BUILDERS
+from engine.families_upper_secondary_english_overrides import UPPER_ENGLISH_GRAMMAR_OVERRIDES
+from engine.families_upper_secondary_math_overrides import UPPER_MATH_OVERRIDES
 from engine.families_upper_secondary_overrides import UPPER_ENGLISH_OVERRIDES
 
 REGISTRY = {
@@ -59,6 +61,8 @@ for group in (
     SPANISH_BUILDERS,
     UPPER_MATH_BUILDERS,
     UPPER_ENGLISH_BUILDERS,
+    UPPER_MATH_OVERRIDES,
+    UPPER_ENGLISH_GRAMMAR_OVERRIDES,
     UPPER_ENGLISH_OVERRIDES,
 ):
     REGISTRY.update(group)
