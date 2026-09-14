@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "adaptive-policy.json"
 DEFAULT_BANDS={"recover":1,"consolidate":2,"advance":2,"extend":4,"reassess":2}
 ALLOWED_INTENTS = {"continue", "lesson", "practice", "assessment"}
+ALLOWED_SUBJECTS = {"mathematics", "english", "italian", "french", "spanish"}
 
 
 def load_policy() -> dict[str, Any]:
@@ -26,8 +27,8 @@ def load_policy() -> dict[str, Any]:
 def _validate_request(request: dict[str, Any]) -> None:
     subject = request.get("subject")
     intent = request.get("intent")
-    if not subject:
-        raise ValueError("subject is required")
+    if subject not in ALLOWED_SUBJECTS:
+        raise ValueError("unsupported subject")
     if intent not in ALLOWED_INTENTS:
         raise ValueError("unsupported intent")
     duration = request.get("duration_minutes")
@@ -39,6 +40,20 @@ def _validate_request(request: dict[str, Any]) -> None:
     quantity = request.get("quantity_hint")
     if quantity is not None and not 1 <= int(quantity) <= 30:
         raise ValueError("quantity_hint outside supported range")
+
+
+def _validate_exchange(exchange: dict[str, Any], *, require_request: bool = False, require_result: bool = False) -> None:
+    if str(exchange.get("version")) != "1.0":
+        raise ValueError("unsupported exchange version")
+    student_ref=exchange.get("student_ref") or {}
+    if not student_ref.get("external_id"):
+        raise ValueError("student_ref.external_id is required")
+    if not isinstance(exchange.get("learning_snapshot"),dict):
+        raise ValueError("learning_snapshot is required")
+    if require_request and not isinstance(exchange.get("request"),dict):
+        raise ValueError("request is required")
+    if require_result and not isinstance(exchange.get("session_result"),dict):
+        raise ValueError("session_result is required")
 
 
 def _requested_action(intent: str, adaptive_action: str, selection_reason: str) -> str:
@@ -73,6 +88,8 @@ def plan(snapshot: dict[str, Any], request: dict[str, Any], *, seed: int = 1) ->
     _validate_request(request)
     policy = load_policy()
     subject = str(request["subject"])
+    if subject not in snapshot.get("subjects", {}):
+        raise ValueError("subject missing from learning snapshot")
     requested_target = request.get("target_competency_id")
 
     selection = select_target(snapshot, subject, requested_target_id=requested_target)
@@ -151,13 +168,16 @@ def record_result(
     session: dict[str, Any],
     session_result: dict[str, Any],
 ) -> dict[str, Any]:
+    if subject not in ALLOWED_SUBJECTS or subject not in snapshot.get("subjects", {}):
+        raise ValueError("invalid transition subject")
+    if session.get("subject") != subject:
+        raise ValueError("session subject does not match transition subject")
     policy = load_policy()
     return transition(snapshot, subject, session, session_result, policy)
 
 
 def hub_plan(exchange: dict[str, Any], *, seed: int = 1) -> dict[str, Any]:
-    if str(exchange.get("version")) != "1.0":
-        raise ValueError("unsupported exchange version")
+    _validate_exchange(exchange,require_request=True)
     snapshot = exchange["learning_snapshot"]
     request = exchange["request"]
     result = plan(snapshot, request, seed=seed)
@@ -169,11 +189,8 @@ def hub_plan(exchange: dict[str, Any], *, seed: int = 1) -> dict[str, Any]:
 
 
 def hub_transition(exchange: dict[str, Any]) -> dict[str, Any]:
-    if str(exchange.get("version")) != "1.0":
-        raise ValueError("unsupported exchange version")
-    result = exchange.get("session_result")
-    if not result:
-        raise ValueError("session_result is required")
+    _validate_exchange(exchange,require_result=True)
+    result = exchange["session_result"]
     metadata = exchange.get("metadata", {})
     subject = metadata.get("subject")
     session = metadata.get("session")
