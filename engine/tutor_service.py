@@ -18,35 +18,52 @@ POLICY_PATH = ROOT / "config" / "adaptive-policy.json"
 DEFAULT_BANDS={"recover":1,"consolidate":2,"advance":2,"extend":4,"reassess":2}
 ALLOWED_INTENTS = {"continue", "lesson", "practice", "assessment"}
 ALLOWED_SUBJECTS = {"mathematics", "english", "italian", "french", "spanish"}
+ALLOWED_REQUEST_FIELDS = {"subject","intent","target_competency_id","duration_minutes","max_challenge_band","quantity_hint","student_view","notes"}
 
 
 def load_policy() -> dict[str, Any]:
     return json.loads(POLICY_PATH.read_text(encoding="utf-8"))
 
 
+def _bounded_int(value: Any, low: int, high: int, field: str) -> None:
+    if value is None:
+        return
+    if isinstance(value,bool) or not isinstance(value,int) or not low <= value <= high:
+        raise ValueError(f"{field} outside supported range")
+
+
 def _validate_request(request: dict[str, Any]) -> None:
+    if not isinstance(request,dict):
+        raise ValueError("request must be an object")
+    unknown=set(request)-ALLOWED_REQUEST_FIELDS
+    if unknown:
+        raise ValueError(f"unsupported request fields: {sorted(unknown)}")
     subject = request.get("subject")
     intent = request.get("intent")
     if subject not in ALLOWED_SUBJECTS:
         raise ValueError("unsupported subject")
     if intent not in ALLOWED_INTENTS:
         raise ValueError("unsupported intent")
-    duration = request.get("duration_minutes")
-    if duration is not None and not 10 <= int(duration) <= 120:
-        raise ValueError("duration_minutes outside supported range")
-    band = request.get("max_challenge_band")
-    if band is not None and not 1 <= int(band) <= 5:
-        raise ValueError("max_challenge_band outside supported range")
-    quantity = request.get("quantity_hint")
-    if quantity is not None and not 1 <= int(quantity) <= 30:
-        raise ValueError("quantity_hint outside supported range")
+    target=request.get("target_competency_id")
+    if target is not None and (not isinstance(target,str) or not target):
+        raise ValueError("invalid target_competency_id")
+    _bounded_int(request.get("duration_minutes"),10,120,"duration_minutes")
+    _bounded_int(request.get("max_challenge_band"),1,5,"max_challenge_band")
+    _bounded_int(request.get("quantity_hint"),1,30,"quantity_hint")
+    if "student_view" in request and not isinstance(request["student_view"],bool):
+        raise ValueError("student_view must be boolean")
+    notes=request.get("notes")
+    if notes is not None and (not isinstance(notes,str) or len(notes)>500):
+        raise ValueError("invalid notes")
 
 
 def _validate_exchange(exchange: dict[str, Any], *, require_request: bool = False, require_result: bool = False) -> None:
+    if not isinstance(exchange,dict):
+        raise ValueError("exchange must be an object")
     if str(exchange.get("version")) != "1.0":
         raise ValueError("unsupported exchange version")
     student_ref=exchange.get("student_ref") or {}
-    if not student_ref.get("external_id"):
+    if not isinstance(student_ref,dict) or not isinstance(student_ref.get("external_id"),str) or not student_ref.get("external_id"):
         raise ValueError("student_ref.external_id is required")
     if not isinstance(exchange.get("learning_snapshot"),dict):
         raise ValueError("learning_snapshot is required")
@@ -85,9 +102,11 @@ def _generate(working_target: str, action: str, root_target: str, *, seed: int, 
 
 
 def plan(snapshot: dict[str, Any], request: dict[str, Any], *, seed: int = 1) -> dict[str, Any]:
+    if not isinstance(snapshot,dict):
+        raise ValueError("learning snapshot must be an object")
     _validate_request(request)
     policy = load_policy()
-    subject = str(request["subject"])
+    subject = request["subject"]
     if subject not in snapshot.get("subjects", {}):
         raise ValueError("subject missing from learning snapshot")
     requested_target = request.get("target_competency_id")
@@ -107,12 +126,12 @@ def plan(snapshot: dict[str, Any], request: dict[str, Any], *, seed: int = 1) ->
         successor=successor,
         depth=depth,
     )
-    action = _requested_action(str(request["intent"]), decision.action, selection["reason"])
+    action = _requested_action(request["intent"], decision.action, selection["reason"])
 
     preferences = snapshot.get("preferences", {})
-    duration = int(request.get("duration_minutes") or preferences.get("default_duration_minutes", 40))
-    max_band = int(request.get("max_challenge_band") or preferences.get("max_challenge_band", 5))
-    quantity_hint = int(request["quantity_hint"]) if request.get("quantity_hint") is not None else None
+    duration = request.get("duration_minutes") or preferences.get("default_duration_minutes", 40)
+    max_band = request.get("max_challenge_band") or preferences.get("max_challenge_band", 5)
+    quantity_hint = request.get("quantity_hint")
     history = list(snapshot.get("recent_activity", {}).get("fingerprints", []))
 
     generated = _generate(
@@ -120,8 +139,8 @@ def plan(snapshot: dict[str, Any], request: dict[str, Any], *, seed: int = 1) ->
         action,
         selection["root_target_id"],
         seed=seed,
-        duration=duration,
-        max_band=max_band,
+        duration=int(duration),
+        max_band=int(max_band),
         quantity_hint=quantity_hint,
         history=history,
     )
