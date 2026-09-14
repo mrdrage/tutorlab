@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TutorLab Tutor Package",
+  "type": "object",
+  "required": ["version", "status", "request", "selection", "objective_stack", "plan", "snapshot_patch", "views"],
+  "properties": {
+    "version": {"const": "1.0-rc1"},
+    "status": {"enum": ["ok", "needs_review"]},
+    "warning": {"type": ["string", "null"]},
+    "request": {"type": "object"},
+    "selection": {
+      "type": "object",
+      "required": ["root_target_id", "working_target_id", "reason"],
+      "properties": {
+        "root_target_id": {"type": "string"},
+        "working_target_id": {"type": "string"},
+        "reason": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "objective_stack": {"type": "object"},
+    "plan": {
+      "type": "object",
+      "required": ["kind", "target", "action", "rationale"],
+      "properties": {
+        "kind": {"enum": ["session", "advance", "return_to", "direct"]},
+        "target": {"type": "string"},
+        "action": {"enum": ["recover", "consolidate", "advance", "extend", "reassess"]},
+        "rationale": {"type": "string"},
+        "decision": {"type": ["object", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "snapshot_patch": {
+      "type": "object",
+      "required": ["subject", "objective_stack"],
+      "properties": {
+        "subject": {"type": "string"},
+        "objective_stack": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "session": {"type": ["object", "null"]},
+    "views": {
+      "type": "object",
+      "required": ["tutor", "student"],
+      "properties": {
+        "tutor": {"type": ["object", "null"]},
+        "student": {"type": ["object", "null"]}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
