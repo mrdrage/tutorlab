@@ -94,23 +94,30 @@ def build_session(target_competency_id,action,*,original_target_id=None,challeng
     requested=max(1,int(quantity_hint)) if quantity_hint is not None else structural_minimum
     extra_indexes=_extra_task_phase_indexes(phases)
     extra_cursor=0
-    while task_counter < requested and extra_indexes:
+    misses=0
+    max_misses=max(1,len(extra_indexes)*3)
+    while task_counter < requested and extra_indexes and misses < max_misses:
         phase_index=extra_indexes[extra_cursor % len(extra_indexes)]
         phase=phases[phase_index]
         kind=phase["kind"]
-        task_counter+=1
+        next_task_number=task_counter+1
         item=build_unique_task(
             target_competency_id,
             kind,
-            seed+5000+task_counter*97+phase_index,
+            seed+5000+next_task_number*97+phase_index,
             _band(base_band,kind),
             _support(kind,action),
-            f"t{task_counter}",
+            f"t{next_task_number}",
             used,
             policy["max_generation_attempts"],
         )
-        phase["tasks"].append(item); used.append(item["fingerprint"])
         extra_cursor+=1
+        if item["fingerprint"] in used:
+            misses+=1
+            continue
+        task_counter=next_task_number
+        misses=0
+        phase["tasks"].append(item); used.append(item["fingerprint"])
 
     return {
         "version":"0.1","session_id":f"session-{target_competency_id.replace('.','-')}-{seed}","subject":subject,
@@ -119,6 +126,7 @@ def build_session(target_competency_id,action,*,original_target_id=None,challeng
         "generation":{
             "engine_version":"0.1","history_fingerprints":history,"original_content":True,
             "task_quantity_requested":requested,"task_quantity_structural_minimum":structural_minimum,"task_quantity_actual":task_counter,
+            "task_quantity_satisfied":task_counter>=requested,"task_quantity_shortfall":max(0,requested-task_counter),
         },"phases":phases
     }
 
