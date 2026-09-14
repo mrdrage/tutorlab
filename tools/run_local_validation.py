@@ -26,6 +26,7 @@ CHECKS = (
     "tools/check_cross_stage_recovery_bridge.py",
     "tools/check_upper_secondary_generation_coverage.py",
     "tools/check_upper_secondary_generation_quality.py",
+    "tools/check_upper_secondary_generator_alignment.py",
     "tools/check_upper_secondary_vertical_slices.py",
 )
 
