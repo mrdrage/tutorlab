@@ -58,7 +58,7 @@ def _gate(node, snapshot, subject):
 def select_target(snapshot, subject, requested_target_id=None):
     subject_state=snapshot["subjects"][subject]
     stack=subject_state.get("objective_stack")
-    if stack and stack.get("frames"):
+    if stack and stack.get("frames") and not requested_target_id:
         return {"root_target_id":stack["root_target_id"],"working_target_id":stack["frames"][-1]["competency_id"],"reason":"resume_objective_stack"}
 
     context=context_for(snapshot,subject)
