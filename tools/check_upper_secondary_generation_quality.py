@@ -40,7 +40,7 @@ def main():
             samples.append((subject,strand,rows[-1]))
 
     for subject,strand,node in samples:
-        cid=node["id"]; transfer_prompts=set()
+        cid=node["id"]; semantic_variants=set()
         for seed in SEEDS:
             try: session=build_session(cid,"advance",original_target_id=cid,seed=seed,policy=policy)
             except Exception as exc:
@@ -56,8 +56,12 @@ def main():
             transfer=tasks_for(session,"transfer")
             if not transfer: failures.append(f"{cid}: no transfer task")
             else:
-                transfer_prompts.add(transfer[0].get("prompt",""))
-                if transfer[0].get("response_mode")=="open_response" and not transfer[0].get("rubric"):
+                item=transfer[0]
+                payload=item.get("prompt","")
+                if subject=="english" and strand=="listening":
+                    payload=item.get("generation_parameters",{}).get("tutor_script",payload)
+                semantic_variants.add(payload)
+                if item.get("response_mode")=="open_response" and not item.get("rubric"):
                     failures.append(f"{cid}: open transfer task lacks rubric")
             if subject=="english" and strand=="listening":
                 all_tasks=[t for p in session.get("phases",[]) for t in p.get("tasks",[])]
@@ -66,7 +70,7 @@ def main():
                 sv=student_view(session)
                 if any("generation_parameters" in t for p in sv["phases"] for t in p.get("tasks",[])):
                     failures.append(f"{cid}: tutor data leaked to student view")
-        if len(transfer_prompts)<2: failures.append(f"{cid}: insufficient semantic diversity across seeds")
+        if len(semantic_variants)<2: failures.append(f"{cid}: insufficient semantic diversity across seeds")
 
     if failures:
         print("Upper Secondary generation quality: FAILED")
