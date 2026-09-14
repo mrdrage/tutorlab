@@ -14,7 +14,7 @@
 - [x] **Reliability v0.5: simulazioni longitudinali + calibrazione mastery**
 - [x] **Language Expansion v0.6: Italiano + Francese + Spagnolo, triennio completo**
 - [x] **Upper Secondary Architecture v0.7: modello dati, percorsi, layer e ponti medie → superiori**
-- [ ] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
+- [x] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
 - [ ] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
@@ -103,26 +103,31 @@ Obiettivo: rappresentare correttamente la secondaria di secondo grado prima di e
 - [x] curriculum componibile per layer: common core → family core → indirizzo → articolazione → opzione → profile;
 - [x] namespace superiore `<subject>.us.*`;
 - [x] prerequisiti verticali medie → superiori tramite gateway Math/English;
-- [x] Learning Snapshot 0.2 con `academic_context` opzionale e compatibilità con snapshot 0.1;
+- [x] Learning Snapshot 0.2 con `academic_context` obbligatorio per gli snapshot 0.2 e compatibilità con snapshot legacy 0.1;
 - [x] target selector stage-aware con fallback legacy invariato;
-- [x] resolver di profilo/layer con controllo di durata, variante e deduplicazione;
-- [x] capability boundary esplicito: i nodi superiori restano `needs_review` finché v0.8 non aggiunge generation coverage;
+- [x] resolver di profilo/layer con controllo di durata, variante, validità temporale e deduplicazione;
+- [x] capability boundary esplicito fra curriculum noto e generazione disponibile;
 - [x] test locali per schema, composizione dei layer, quadriennali, prerequisiti verticali e retrocompatibilità;
 - [x] nessun GitHub Actions/Workflow.
 
-Il catalogo dei percorsi in v0.7 è un seed architetturale rappresentativo, non l'elenco territoriale esaustivo di ogni opzione attivata dalle singole scuole. La v0.8 aggiungerà i profili necessari ai curriculum Math/English senza duplicare il common core.
+Il catalogo dei percorsi in v0.7 è un seed architetturale rappresentativo, non l'elenco territoriale esaustivo di ogni opzione attivata dalle singole scuole.
 
 ## v0.8 — Matematica + Inglese 1ª-5ª superiore
 
-- [ ] curriculum Matematica per i principali profili/indirizzi;
-- [ ] curriculum Inglese con progressione A2 → B1 → B2 coerente con il percorso;
-- [ ] generation coverage completa;
-- [ ] mastery rubric e Difficulty Engine calibrati per il nuovo stage;
-- [ ] vertical slice completi per biennio e triennio;
-- [ ] capability registry superiore attivata soltanto per nodi realmente generabili;
-- [ ] validazione locale senza workflow a pagamento.
+- [x] curriculum Matematica per common core e overlay liceali, scientifici, tecnici e professionali;
+- [x] curriculum Inglese con progressione A2 bridge → B1/B1+ → B2 e linguaggio professionale/interculturale;
+- [x] generation coverage completa dei 136 nodi superiori Math/English;
+- [x] 680 combinazioni adattive `recover/consolidate/advance/extend/reassess` validate nel banco prova locale;
+- [x] mastery rubric dedicate allo stage superiore;
+- [x] generatori competency-aware per i nodi che richiedono allineamento semantico specifico;
+- [x] quality gate su worked example, transfer, listening, diversità dei seed e Student View;
+- [x] vertical slice end-to-end su Matematica scientifica e Inglese B2 fino a evidence/state/next step;
+- [x] capability registry superiore attivata soltanto per nodi realmente generabili;
+- [x] profili quinquennali e quadriennali attraversati dal resolver;
+- [x] fonti MIM/QCER/INVALSI documentate con distinzione tra curriculum e assessment;
+- [x] validazione locale/manuale senza workflow a pagamento.
 
-La realizzazione potrà essere divisa internamente in due grandi sotto-blocchi, 1ª-2ª e 3ª-5ª, ma la copertura finale deve restare un unico percorso verticale interrogabile dal motore.
+La copertura v0.8 è verticale e componibile: i nodi comuni non vengono clonati per ogni indirizzo, mentre gli overlay modulano profondità, contesto e traguardi.
 
 ## v0.9 — Longitudinal Reliability 8-year
 
