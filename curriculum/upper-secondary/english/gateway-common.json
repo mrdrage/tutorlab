@@ -38,9 +38,11 @@
         "Comprensione scritta nettamente superiore al riconoscimento nel parlato"
       ],
       "difficulty_levers": ["language_demand", "discourse_span", "productive_freedom", "representation_demand"],
+      "cefr_anchor": "A2",
+      "progression_stage": "A2_bridge",
       "applies_to_profile_ids": [],
       "excludes_profile_ids": [],
-      "notes": "Nodo gateway comune. La progressione B1/B2 sarà definita nel curriculum v0.8."
+      "notes": "Nodo gateway comune tra il traguardo A2 delle medie e la progressione B1 delle superiori."
     },
     {
       "id": "eng.us.gateway.a2-autonomy",
@@ -65,6 +67,8 @@
         "Dipendenza costante dal supporto"
       ],
       "difficulty_levers": ["transfer_distance", "language_demand", "strategy_selection", "support_fading"],
+      "cefr_anchor": "A2",
+      "progression_stage": "A2_bridge",
       "applies_to_profile_ids": [],
       "excludes_profile_ids": []
     }
