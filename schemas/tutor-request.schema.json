@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TutorLab Tutor Request",
+  "type": "object",
+  "required": ["version", "subject"],
+  "properties": {
+    "version": {"const": "1.0-rc1"},
+    "subject": {"enum": ["mathematics", "english", "italian", "french", "spanish"]},
+    "requested_target_id": {"type": ["string", "null"], "minLength": 1},
+    "duration_minutes": {"type": "integer", "minimum": 10, "maximum": 120},
+    "seed": {"type": "integer", "minimum": 0},
+    "intent": {"enum": ["adaptive", "practice", "assessment", "diagnostic"]},
+    "max_challenge_band": {"type": "integer", "minimum": 1, "maximum": 5},
+    "output": {"enum": ["both", "tutor", "student"]}
+  },
+  "additionalProperties": false
+}
