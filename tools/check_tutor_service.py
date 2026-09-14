@@ -35,6 +35,7 @@ def _all_correct_result(session):
 
 def main() -> int:
     snapshot=mathematics_case()
+    original=deepcopy(snapshot)
 
     continued=plan(snapshot,{"subject":"mathematics","intent":"continue","duration_minutes":40},seed=101)
     assert continued["status"]=="ok"
@@ -75,8 +76,7 @@ def main() -> int:
     assert update["snapshot_update"]["recent_activity"]["session_ids"]
     assert update["next_step"]["action"] in {"recover","consolidate","advance","extend","reassess","return_to"}
 
-    original=deepcopy(snapshot)
-    assert snapshot==original
+    assert snapshot==original, "plan/hub_plan mutated the caller snapshot"
 
     print("Tutor service v1.0 checks: OK")
     return 0
