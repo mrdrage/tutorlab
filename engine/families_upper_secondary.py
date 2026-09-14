@@ -170,6 +170,8 @@ LISTENING_BANK = {
     "B2": [
         ("The speaker supports the new project overall, although she questions its cost. She argues that a smaller pilot would provide evidence before the organisation makes a long-term commitment.", "she supports testing the project on a smaller scale first"),
         ("The lecturer does not reject artificial intelligence in education, but warns that convenience can hide weak understanding. He recommends using it to compare ideas and receive feedback rather than to replace the student's own reasoning.", "AI should support reasoning and feedback rather than replace thinking"),
+        ("The project manager says the deadline can still be met, but only if testing begins this week. She asks the team to postpone two optional features and focus first on reliability.", "the team should prioritise testing and reliability to protect the deadline"),
+        ("The engineer agrees that the new system is faster, yet warns that staff need more training before it is used with customers. He recommends a short internal trial before full deployment.", "the faster system should be tested internally while staff receive training"),
     ],
 }
 
