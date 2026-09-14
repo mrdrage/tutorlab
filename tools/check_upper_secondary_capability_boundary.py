@@ -19,7 +19,7 @@ def main():
         "eng.us.gateway.a2-integrated-control",
         "eng.us.reading.b1-gist-detail",
         "eng.us.liceo.integrated.b2-target",
-        "eng.us.prof.integrated-b1plus-target",
+        "eng.us.prof.integrated-b2-target",
     )
     for competency_id in supported:
         result=dispatch(competency_id,"reassess",competency_id,seed=7)
