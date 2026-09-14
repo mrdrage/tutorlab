@@ -15,7 +15,7 @@
 - [x] **Language Expansion v0.6: Italiano + Francese + Spagnolo, triennio completo**
 - [x] **Upper Secondary Architecture v0.7: modello dati, percorsi, layer e ponti medie → superiori**
 - [x] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
-- [ ] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
+- [x] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
@@ -131,15 +131,23 @@ La copertura v0.8 è verticale e componibile: i nodi comuni non vengono clonati 
 
 ## v0.9 — Longitudinal Reliability 8-year
 
-- [ ] simulazioni sintetiche dalla 1ª media alla 5ª superiore;
-- [ ] recuperi che possono attraversare il confine tra cicli scolastici;
-- [ ] controllo di ritorno all'obiettivo sospeso dopo recuperi profondi;
-- [ ] calibrazione delle soglie per stage e famiglie di competenze;
-- [ ] metriche su avanzamento prematuro, stagnazione, falsi recuperi e stabilità nel tempo.
+- [x] otto checkpoint consecutivi dalla 1ª media alla 5ª superiore per Matematica e Inglese;
+- [x] profili forti, tipici, con gap cross-stage e dipendenza dal supporto;
+- [x] recuperi che attraversano il confine medie → superiori;
+- [x] recuperi annidati fino alla profondità massima 2 e ritorno ordinato nello stack;
+- [x] rivalutazione del target sospeso dopo il recupero;
+- [x] mastery calibrata su una finestra recente di 12 evidenze mantenendo lo storico lifetime;
+- [x] confronto read-only di finestre candidate 0/12/18/24;
+- [x] regressione sulla Reliability v0.5 e test specifico della evidence window;
+- [x] metriche su avanzamento prematuro, falsi recuperi, loop, stagnazione, completion e support dependency;
+- [x] 100 seed per profilo nel test di accettazione esteso;
+- [x] nessun GitHub Actions/Workflow.
+
+Nel banco prova sintetico equivalente v0.9 la configurazione scelta ha mantenuto premature advance sotto l'1%, cross-stage detection/return al 100%, deep recovery detection/return intorno al 93%, completion dei profili tipici al 100% e guardia support-dependent al 100%. Questi numeri sono metriche ingegneristiche sintetiche, non risultati su studenti reali.
 
 ## Esperienza Tutor e Hub Scuola
 
-Restano obiettivi strategici successivi alla solidità curricolare verticale:
+Con la copertura verticale Math/English e la reliability 8-year chiuse, il prossimo asse strategico è l'esperienza d'uso del tutor e il contratto applicativo con Hub Scuola:
 
 - comandi ad alto livello, es. «preparami 40 minuti»;
 - output pronto per lezione e verifica;
