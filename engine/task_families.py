@@ -25,6 +25,10 @@ from engine.families_math_year2_practices import MATH_Y2_PRACTICE_BUILDERS
 from engine.families_math_year3_geometry_data import MATH_Y3_GEOMETRY_DATA_BUILDERS
 from engine.families_math_year3_numbers_algebra import MATH_Y3_NUMBERS_ALGEBRA_BUILDERS
 from engine.families_math_year3_practices import MATH_Y3_PRACTICE_BUILDERS
+from engine.families_upper_secondary import UPPER_ENGLISH_BUILDERS, UPPER_MATH_BUILDERS
+from engine.families_upper_secondary_english_overrides import UPPER_ENGLISH_GRAMMAR_OVERRIDES
+from engine.families_upper_secondary_math_overrides import UPPER_MATH_OVERRIDES
+from engine.families_upper_secondary_overrides import UPPER_ENGLISH_OVERRIDES
 
 REGISTRY = {
     "math.numbers.fraction-equivalence": fraction_equivalence_task,
@@ -55,6 +59,11 @@ for group in (
     ITALIAN_BUILDERS,
     FRENCH_BUILDERS,
     SPANISH_BUILDERS,
+    UPPER_MATH_BUILDERS,
+    UPPER_ENGLISH_BUILDERS,
+    UPPER_MATH_OVERRIDES,
+    UPPER_ENGLISH_GRAMMAR_OVERRIDES,
+    UPPER_ENGLISH_OVERRIDES,
 ):
     REGISTRY.update(group)
 
