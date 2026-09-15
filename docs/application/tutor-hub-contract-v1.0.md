@@ -1,103 +1,93 @@
-# TutorLab Tutor + Hub Scuola Contract v1.0
+# Tutor Experience + Hub Scuola Contract v1.0
 
-## Goal
+## Scopo
 
-Expose TutorLab as a reusable didactic service without coupling the engine to Hub Scuola's database or UI.
+TutorLab espone un facade applicativo stabile sopra target selection, Adaptive Engine, Session Engine e result transition. Hub Scuola resta proprietario di identità, persistenza e interfaccia; TutorLab riceve uno stato didattico e restituisce decisioni, sessioni ed aggiornamenti strutturati.
 
-The application flow is:
+## Comando tutor
 
-`tutor request → target selection → adaptive decision → session generation → student/tutor views → result → evidence → Learning Snapshot → next step`
+Il contratto supporta quattro intenti:
 
-Hub Scuola owns persistence and learner identity. TutorLab owns didactic selection, generation, evidence interpretation and next-step recommendation.
+- `continue`: prosegue il percorso adattivo;
+- `lesson`: prepara una sessione didattica sul target selezionato;
+- `practice`: privilegia consolidamento/pratica ma non può saltare un prerequisito noto;
+- `assessment`: verifica il working target selezionato, incluso un prerequisito quando il gate curricolare lo richiede.
 
-## Tutor request
+Il tutor può inoltre impostare:
 
-The tutor can express:
+- target esplicito;
+- durata tra 10 e 120 minuti;
+- challenge band massima 1-5;
+- `quantity_hint` tra 1 e 30;
+- Student View on/off;
+- note applicative brevi.
 
-- subject;
-- intent: `continue`, `lesson`, `practice`, `assessment`;
-- optional target competency;
-- duration;
-- maximum challenge band;
-- optional quantity hint and notes.
+## Quantity hint
 
-The command is a preference layer, not a bypass of the adaptive engine. A known missing prerequisite takes precedence over a request to practise or advance the root target.
+`quantity_hint` è un obiettivo best-effort, non un ordine di duplicare esercizi.
 
-## Planning
+Il Session Engine:
 
-`engine.tutor_service.plan(snapshot, request)` returns:
+1. costruisce sempre il minimo strutturale richiesto dalla pedagogia dell'azione;
+2. aggiunge task soprattutto a pratica autonoma/guidata, verifica e transfer;
+3. conserva fingerprint unici;
+4. si ferma se la famiglia non offre altra varietà;
+5. espone `task_quantity_requested`, `task_quantity_actual`, `task_quantity_shortfall` e `task_quantity_satisfied`.
 
-- target selection and reason;
-- adaptive decision and final session action;
-- objective stack to persist;
-- Tutor View session;
-- optional Student View session with solutions/rubrics/error signals removed.
+## Contratto Hub Scuola
 
-Planning does not mutate the caller's Learning Snapshot.
+Input minimo:
 
-## Hub Scuola boundary
+- `student_ref.external_id`: riferimento opaco gestito da Hub Scuola;
+- `learning_snapshot`: stato didattico TutorLab;
+- `request`: comando tutor.
 
-Hub Scuola sends a versioned exchange envelope containing:
+Output planning:
 
-- `student_ref.external_id`: opaque identifier owned by Hub Scuola;
-- `learning_snapshot`: TutorLab state;
-- `request`: tutor command for planning;
-- or `session_result` plus the session metadata for transition.
+- selection root/working target;
+- decisione adattiva e azione finale;
+- objective stack;
+- sessione Tutor View;
+- Student View sanitizzata.
 
-TutorLab does not need access to Hub Scuola tables, names, grades database or authentication system. The external ID is treated as an opaque reference.
+Round-trip risultati:
 
-## Persistence ownership
+`Hub Scuola -> session_result -> TutorLab -> evidence events -> snapshot update -> next step -> Hub Scuola`
 
-Hub Scuola should persist:
+TutorLab non conosce tabelle, account, login o schema storage di Hub Scuola.
 
-1. the Learning Snapshot;
-2. the planned objective stack when a session is accepted;
-3. the generated session identifier and relevant presentation payload;
-4. the returned `snapshot_update` after results are recorded;
-5. the `next_step` recommendation.
+## Guardrail
 
-TutorLab remains stateless between calls except for versioned curriculum/configuration stored in its own package.
+- lesson/practice non bypassano lacune di prerequisito note;
+- assessment testa il working target selezionato;
+- request sconosciute, tipi errati e materie non supportate sono rifiutati;
+- planning non muta lo snapshot chiamante;
+- una sessione non può aggiornare una materia differente;
+- Student View rimuove solution, rubric, error signals e generation parameters;
+- snapshot/request/seed uguali producono la stessa sessione.
 
-## Safety and privacy
+## Validazione
 
-Repository fixtures must remain fictional. Real student/minor data must not be committed to TutorLab Git.
+Sono versionati nel runner locale:
 
-Student View must not expose:
+- `tools/check_tutor_contract_schemas.py`;
+- `tools/check_tutor_service.py`.
 
-- solutions;
-- rubrics;
-- error signals;
-- generation parameters;
-- hidden tutor rationale.
+Nel runtime disponibile sono stati eseguiti con esito positivo:
 
-## Intent semantics
+- JSON Schema Draft 2020-12 reali del branch, inclusi casi negativi;
+- compilazione dei file runtime modificati;
+- regressione eseguibile su `session_engine.py` e `tutor_service.py` con dipendenze controllate;
+- comportamento legacy del Session Engine senza `quantity_hint`;
+- quantity hint, fingerprint e Student View;
+- determinismo;
+- priorità dei prerequisiti in practice;
+- assessment del prerequisito selezionato;
+- immutabilità dello snapshot;
+- protezione cross-subject.
 
-- `continue`: use the adaptive engine normally.
-- `lesson`: use the adaptive engine normally while respecting the requested duration/target.
-- `practice`: may keep an otherwise advancing secure target in consolidation for the requested practice session, but never overrides a prerequisite recovery.
-- `assessment`: forces `reassess` on the selected working target, but still respects prerequisite selection performed before generation.
+Il container usato in questa sessione non dispone di uscita HTTPS verso GitHub, quindi non può effettuare `git clone` del repository e non può eseguire il runner cumulativo sul checkout completo. `tools/run_local_validation.py` resta il comando canonico per quell'esecuzione in un ambiente con checkout locale.
 
-## Non-goals
+## Costi CI
 
-This contract does not define:
-
-- Hub Scuola database migrations;
-- HTTP transport;
-- authentication or authorization;
-- UI components;
-- PDF rendering;
-- cloud deployment.
-
-Those should be adapters around this contract, not changes to the didactic engine.
-
-## Acceptance criteria
-
-- Tutor requests are schema-valid and bounded.
-- Invalid subjects/intents/duration/bands are rejected.
-- Planning is deterministic for a fixed snapshot/request/seed.
-- Planning does not mutate the input snapshot.
-- Known prerequisite gaps cannot be bypassed by practice/lesson commands.
-- Assessment generates a reassessment session.
-- Student View does not leak tutor-only fields.
-- Hub round-trip converts session results into evidence, updates the snapshot and returns a valid next step.
-- No GitHub Actions workflow is required.
+Nessun GitHub Actions workflow fa parte di questo contratto. Le verifiche restano locali/manuali.
