@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.local/schemas/hub-exchange.schema.json",
+  "title": "TutorLab Hub Scuola Exchange",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "student_ref", "learning_snapshot"],
+  "properties": {
+    "version": {"const": "1.0"},
+    "student_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_id"],
+      "properties": {
+        "external_id": {"type": "string", "minLength": 1},
+        "display_name": {"type": ["string", "null"]}
+      }
+    },
+    "learning_snapshot": {"type": "object"},
+    "request": {"$ref": "tutor-request.schema.json"},
+    "session_result": {"type": ["object", "null"]},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

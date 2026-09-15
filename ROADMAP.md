@@ -16,6 +16,7 @@
 - [x] **Upper Secondary Architecture v0.7: modello dati, percorsi, layer e ponti medie → superiori**
 - [x] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
 - [x] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
+- [x] **Tutor Experience + Hub Scuola Contract v1.0: facade applicativo, comandi tutor e round-trip dati**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
@@ -147,15 +148,21 @@ Nel banco prova sintetico equivalente v0.9 la configurazione scelta ha mantenuto
 
 ## Esperienza Tutor e Hub Scuola
 
-Con la copertura verticale Math/English e la reliability 8-year chiuse, il prossimo asse strategico è l'esperienza d'uso del tutor e il contratto applicativo con Hub Scuola:
+Con la copertura verticale Math/English e la reliability 8-year chiuse, il nuovo facade applicativo rende il motore consumabile dal tutor e da Hub Scuola senza legarlo a database o UI specifici.
 
-- comandi ad alto livello, es. «preparami 40 minuti»;
-- output pronto per lezione e verifica;
-- controllo esplicito di tempo, difficoltà e quantità;
-- adapter tra storage Hub Scuola e Learning Snapshot;
-- persistenza applicativa di attività, evidenze e prossimo obiettivo;
-- TutorLab indipendente dal database e dalla UI di Hub Scuola.
+- [x] comandi ad alto livello `continue / lesson / practice / assessment`;
+- [x] output pronto per Tutor View e Student View;
+- [x] controllo esplicito di tempo, difficoltà e quantità;
+- [x] contratto tra storage Hub Scuola e Learning Snapshot;
+- [x] round-trip di attività, evidenze, snapshot e prossimo obiettivo;
+- [x] TutorLab indipendente dal database e dalla UI di Hub Scuola;
+- [x] protezione dei prerequisiti anche quando il tutor forza pratica o verifica;
+- [x] validazione runtime e schema del contratto v1.0.
 
 ## v1.0 — TutorLab stabile
 
-TutorLab 1.0 deve poter ricevere uno stato didattico, scegliere un obiettivo coerente, verificare prerequisiti, costruire una sessione, interpretare i risultati, proporre il passo successivo e motivare ogni decisione in modo verificabile dal tutor, su una copertura curricolare sufficientemente ampia e testata longitudinalmente.
+TutorLab 1.0 può ricevere uno stato didattico, scegliere un obiettivo coerente, verificare prerequisiti, costruire una sessione, interpretare i risultati, proporre il passo successivo e motivare ogni decisione in modo verificabile dal tutor, su una copertura curricolare ampia e testata longitudinalmente.
+
+### Nota di validazione v1.0
+
+Il container di esecuzione non dispone di connettività HTTPS verso GitHub e non può effettuare un clone completo. Sono stati quindi eseguiti nel runtime i JSON Schema reali e una regressione eseguibile sui file runtime modificati (`session_engine.py` e `tutor_service.py`), includendo comportamento legacy senza `quantity_hint`, determinismo, priorità dei prerequisiti, assessment, quantità, fingerprint, Student View e protezione cross-subject. Il runner cumulativo resta versionato in `tools/run_local_validation.py` per esecuzione in un ambiente con checkout completo.
