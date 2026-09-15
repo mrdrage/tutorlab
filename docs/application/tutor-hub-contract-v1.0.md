@@ -13,42 +13,17 @@ Il contratto supporta quattro intenti:
 - `practice`: privilegia consolidamento/pratica ma non può saltare un prerequisito noto;
 - `assessment`: verifica il working target selezionato, incluso un prerequisito quando il gate curricolare lo richiede.
 
-Il tutor può inoltre impostare:
-
-- target esplicito;
-- durata tra 10 e 120 minuti;
-- challenge band massima 1-5;
-- `quantity_hint` tra 1 e 30;
-- Student View on/off;
-- note applicative brevi.
+Il tutor può inoltre impostare target esplicito, durata tra 10 e 120 minuti, challenge band massima 1-5, `quantity_hint` tra 1 e 30, Student View on/off e note applicative brevi.
 
 ## Quantity hint
 
-`quantity_hint` è un obiettivo best-effort, non un ordine di duplicare esercizi.
-
-Il Session Engine:
-
-1. costruisce sempre il minimo strutturale richiesto dalla pedagogia dell'azione;
-2. aggiunge task soprattutto a pratica autonoma/guidata, verifica e transfer;
-3. conserva fingerprint unici;
-4. si ferma se la famiglia non offre altra varietà;
-5. espone `task_quantity_requested`, `task_quantity_actual`, `task_quantity_shortfall` e `task_quantity_satisfied`.
+`quantity_hint` è un obiettivo best-effort, non un ordine di duplicare esercizi. Il Session Engine costruisce sempre il minimo strutturale richiesto dalla pedagogia dell'azione, aggiunge task soprattutto a pratica, verifica e transfer, conserva fingerprint unici, si ferma quando la varietà disponibile è esaurita ed espone `task_quantity_requested`, `task_quantity_actual`, `task_quantity_shortfall` e `task_quantity_satisfied`.
 
 ## Contratto Hub Scuola
 
-Input minimo:
+Input minimo: `student_ref.external_id`, `learning_snapshot` e `request`.
 
-- `student_ref.external_id`: riferimento opaco gestito da Hub Scuola;
-- `learning_snapshot`: stato didattico TutorLab;
-- `request`: comando tutor.
-
-Output planning:
-
-- selection root/working target;
-- decisione adattiva e azione finale;
-- objective stack;
-- sessione Tutor View;
-- Student View sanitizzata.
+Output planning: selection root/working target, decisione adattiva e azione finale, objective stack, sessione Tutor View e Student View sanitizzata.
 
 Round-trip risultati:
 
@@ -68,25 +43,11 @@ TutorLab non conosce tabelle, account, login o schema storage di Hub Scuola.
 
 ## Validazione
 
-Sono versionati nel runner locale:
+Sono versionati nel runner locale `tools/check_tutor_contract_schemas.py` e `tools/check_tutor_service.py`.
 
-- `tools/check_tutor_contract_schemas.py`;
-- `tools/check_tutor_service.py`.
+Nel runtime disponibile sono stati eseguiti con esito positivo i JSON Schema Draft 2020-12 reali del branch, inclusi casi negativi, la compilazione dei file runtime modificati e una regressione eseguibile sui file reali `session_engine.py` e `tutor_service.py` con dipendenze controllate. La regressione ha verificato comportamento legacy senza `quantity_hint`, quantità, fingerprint, Student View, determinismo, priorità dei prerequisiti, assessment, immutabilità dello snapshot e protezione cross-subject.
 
-Nel runtime disponibile sono stati eseguiti con esito positivo:
-
-- JSON Schema Draft 2020-12 reali del branch, inclusi casi negativi;
-- compilazione dei file runtime modificati;
-- regressione eseguibile su `session_engine.py` e `tutor_service.py` con dipendenze controllate;
-- comportamento legacy del Session Engine senza `quantity_hint`;
-- quantity hint, fingerprint e Student View;
-- determinismo;
-- priorità dei prerequisiti in practice;
-- assessment del prerequisito selezionato;
-- immutabilità dello snapshot;
-- protezione cross-subject.
-
-Il container usato in questa sessione non dispone di uscita HTTPS verso GitHub, quindi non può effettuare `git clone` del repository e non può eseguire il runner cumulativo sul checkout completo. `tools/run_local_validation.py` resta il comando canonico per quell'esecuzione in un ambiente con checkout locale.
+Il container usato in questa sessione non dispone di uscita HTTPS verso GitHub, quindi non può effettuare `git clone` del repository. Il runner cumulativo `tools/run_local_validation.py` resta il comando canonico per un ambiente con checkout completo. Il merge v1.0 si basa quindi sulla suite storica già chiusa nei macro-blocchi v0.x più la regressione mirata e gli schema test dei soli confini runtime modificati in v1.0.
 
 ## Costi CI
 
