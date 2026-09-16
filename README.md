@@ -4,7 +4,7 @@ TutorLab è un motore didattico adattivo per tutor e studenti.
 
 L'obiettivo è costruire una **collana didattica viva e generativa**: non una raccolta statica di esercizi, ma un sistema capace di capire cosa uno studente sa, individuare prerequisiti mancanti, proporre attività calibrate, interpretare gli errori e decidere il passo didattico successivo.
 
-La prima fase è dedicata alla **scuola secondaria di primo grado (1ª, 2ª e 3ª media)**, con moduli iniziali di **Matematica** e **Inglese**. L'architettura è pensata per estendersi a Italiano, Francese, Scienze, Storia e Geografia.
+Il principio guida è semplice: **TutorLab deve sapere cosa insegnare dopo, non soltanto generare contenuti.**
 
 ## Ciclo didattico
 
@@ -21,31 +21,48 @@ TutorLab segue un ciclo comune:
 9. recupero, consolidamento o potenziamento;
 10. nuova verifica.
 
-Il principio guida è semplice: **TutorLab deve sapere cosa insegnare dopo, non soltanto generare contenuti.**
+Se emerge una lacuna nei prerequisiti, TutorLab può sospendere temporaneamente l'obiettivo corrente, recuperare la competenza mancante e poi ritornare al target iniziale.
 
-## Stato
+## Stato del progetto
 
-Il progetto è in fase di fondazione. Il primo target è **TutorLab v0.1**.
+**TutorLab v1.0** è il baseline stabile su `main`.
 
-La v0.1 formalizzerà:
+La v1.0 comprende:
 
-- principi pedagogici;
-- schema delle competenze;
-- tassonomia degli errori;
-- livelli di difficoltà;
-- curriculum 1ª-3ª media per Matematica e Inglese;
-- formato delle sessioni didattiche e dei risultati;
-- criteri di avanzamento, recupero e consolidamento;
-- primi percorsi completi end-to-end.
+- curriculum e grafi dei prerequisiti per Matematica e Inglese dalla 1ª media alla 5ª superiore;
+- Italiano, Francese e Spagnolo per il triennio della scuola media;
+- Adaptive Engine, Session Engine e Learning Snapshot;
+- recovery stack e ponti medie -> superiori;
+- mastery calibrata su evidenze recenti mantenendo lo storico;
+- simulazioni longitudinali fino a otto anni scolastici;
+- facade applicativo con intenti `continue / lesson / practice / assessment`;
+- Tutor View e Student View separate;
+- contratto dati v1.0 per l'integrazione con Hub Scuola.
+
+Il branch `integration/json-bridge-v1.1` sviluppa il passo successivo: un bridge JSON locale per invocare il facade TutorLab da processi esterni senza accoppiare il motore a database, UI o autenticazione.
+
+Per il dettaglio delle milestone vedere `ROADMAP.md`.
 
 ## Relazione con Hub Scuola
 
-TutorLab nasce come progetto indipendente.
+TutorLab resta un progetto indipendente.
 
-- **TutorLab**: motore didattico e decisionale.
-- **Hub Scuola**: gestione, memoria e visualizzazione del percorso dello studente.
+- **TutorLab**: curriculum, prerequisiti, decisione didattica, generazione delle sessioni e interpretazione dei risultati.
+- **Hub Scuola**: identità, persistenza, interfaccia e memoria applicativa dello studente.
 
-Una futura integrazione permetterà a Hub Scuola di fornire il profilo didattico dello studente e a TutorLab di restituire attività, analisi degli errori e prossimo obiettivo consigliato.
+L'integrazione avviene tramite contratti versionati: Hub fornisce un Learning Snapshot e una richiesta; TutorLab restituisce sessione, evidenze, aggiornamento dello snapshot e prossimo passo consigliato.
+
+TutorLab non deve conoscere tabelle, account, login o dettagli di storage di Hub Scuola.
+
+## Validazione
+
+Il comando canonico è:
+
+```bash
+python tools/run_local_validation.py
+```
+
+Le verifiche sono locali/manuali. Il progetto non richiede GitHub Actions o workflow a pagamento.
 
 ## Privacy
 
@@ -53,4 +70,4 @@ Nessun dato reale degli studenti deve essere versionato nel repository. Esempi, 
 
 ## Licenza e contenuti
 
-TutorLab produrrà materiale didattico originale. Non ha l'obiettivo di riprodurre testi o esercizi di manuali scolastici protetti da copyright.
+TutorLab produce materiale didattico originale. Non ha l'obiettivo di riprodurre testi o esercizi di manuali scolastici protetti da copyright.
