@@ -112,6 +112,41 @@ L'output contiene:
 
 Una sessione non può essere applicata a una materia diversa da quella per cui è stata generata.
 
+## Integrazione locale con Hub Scuola
+
+Hub Scuola è un'app Next.js locale con server Node e database SQLite locale. Il bridge deve essere invocato esclusivamente dal lato server di Hub, mai da un Client Component del browser.
+
+Il modello previsto è:
+
+`Next server -> child_process.spawn -> Python -> tutor_service_bridge.py -> stdout JSON -> Next server`
+
+Regole operative:
+
+- usare `spawn` con `shell: false`;
+- usare un percorso TutorLab configurato e non controllabile dall'utente finale;
+- passare al processo soltanto il path fisso di `tools/tutor_service_bridge.py`;
+- inviare l'envelope JSON esclusivamente tramite `stdin`;
+- non inserire dati studente negli argomenti della command line, nelle variabili d'ambiente o in file temporanei;
+- raccogliere `stdout` come un singolo documento JSON e validarne `bridge_version`;
+- considerare `stderr` diagnostico e non parte del protocollo;
+- imporre lato Hub un timeout e un limite alla dimensione dell'output;
+- usare l'exit code per distinguere successo processo/errore, ma usare `error.code` per la logica applicativa;
+- non aprire porte di rete e non introdurre un servizio HTTP solo per collegare i due progetti.
+
+Esempio minimale del confine Node, da implementare nel repository Hub Scuola e non dentro il core TutorLab:
+
+```ts
+const child = spawn(pythonExecutable, [bridgePath], {
+  cwd: tutorLabRoot,
+  shell: false,
+  stdio: ["pipe", "pipe", "pipe"],
+});
+
+child.stdin.end(JSON.stringify(envelope));
+```
+
+La scelta di `stdin` evita che dati scolastici compaiano nella process list o nella cronologia della shell. Hub continua a essere l'unico proprietario del database e deve tradurre i propri record in Learning Snapshot prima della chiamata, quindi applicare `snapshot_update` soltanto attraverso il proprio `src/core`.
+
 ## Proprietà verificate
 
 `tools/check_tutor_service_bridge_schemas.py` verifica la validità Draft 2020-12 dei due schema bridge e casi positivi/negativi degli envelope.
