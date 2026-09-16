@@ -52,6 +52,7 @@ def _all_correct_result(session):
             responses.append(
                 {
                     "task_id": task["task_id"],
+                    "response": "synthetic-correct-response",
                     "status": "correct",
                     "score": 1.0,
                     "support_used": "none",
@@ -62,7 +63,10 @@ def _all_correct_result(session):
                 }
             )
     return {
+        "version": "0.1",
+        "session_id": session["session_id"],
         "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completion_status": "completed",
         "responses": responses,
     }
 
@@ -139,6 +143,26 @@ def main() -> int:
     _assert_protocol_error(
         wrong_code,
         wrong_body,
+        "TUTORLAB_VALIDATION_ERROR",
+        expected_type="ValueError",
+    )
+
+    wrong_session = deepcopy(transition_exchange)
+    wrong_session["session_result"]["session_id"] = "another-session"
+    wrong_session_code, wrong_session_body = call(envelope("transition", wrong_session))
+    _assert_protocol_error(
+        wrong_session_code,
+        wrong_session_body,
+        "TUTORLAB_VALIDATION_ERROR",
+        expected_type="ValueError",
+    )
+
+    missing_response = deepcopy(transition_exchange)
+    del missing_response["session_result"]["responses"][0]["response"]
+    missing_response_code, missing_response_body = call(envelope("transition", missing_response))
+    _assert_protocol_error(
+        missing_response_code,
+        missing_response_body,
         "TUTORLAB_VALIDATION_ERROR",
         expected_type="ValueError",
     )
