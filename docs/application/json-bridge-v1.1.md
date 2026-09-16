@@ -6,27 +6,69 @@ Il bridge JSON rende il facade applicativo di TutorLab invocabile da un processo
 
 Il protocollo usa JSON su `stdin` e `stdout`. Hub Scuola resta proprietario di identità e persistenza; TutorLab resta proprietario delle decisioni didattiche, della generazione delle sessioni e dell'interpretazione dei risultati.
 
+La release TutorLab è `v1.1`; la prima versione del protocollo bridge è `bridge_version = "1.0"`. Il contratto Hub Scuola contenuto nel payload resta `version = "1.0"`. Le due versioni sono separate intenzionalmente.
+
 ## Envelope
 
 Ogni richiesta al bridge è un oggetto JSON con:
 
+- `bridge_version`: attualmente `"1.0"`;
 - `operation`: `plan` oppure `transition`;
 - `payload`: oggetto conforme al contratto Hub Scuola v1.0;
 - `seed`: intero opzionale usato soltanto da `plan`, default `1`.
 
+Campi sconosciuti vengono rifiutati. `seed` non è ammesso per `transition`.
+
 Successo:
 
 ```json
-{"ok": true, "result": {}}
+{
+  "bridge_version": "1.0",
+  "ok": true,
+  "result": {}
+}
 ```
 
 Errore:
 
 ```json
-{"ok": false, "error": {"type": "ValueError", "message": "..."}}
+{
+  "bridge_version": "1.0",
+  "ok": false,
+  "error": {
+    "code": "INVALID_PAYLOAD",
+    "type": "BridgeProtocolError",
+    "message": "payload must be an object"
+  }
+}
 ```
 
+`error.code` è il campo stabile per i client. `error.type` e `error.message` servono al debug e non devono essere usati come contratto applicativo.
+
+Codici previsti:
+
+- `EMPTY_REQUEST`;
+- `INVALID_JSON`;
+- `INVALID_ENVELOPE`;
+- `INVALID_PAYLOAD`;
+- `INVALID_SEED`;
+- `UNSUPPORTED_BRIDGE_VERSION`;
+- `UNSUPPORTED_OPERATION`;
+- `TUTORLAB_VALIDATION_ERROR`;
+- `INTERNAL_ERROR`.
+
 Gli errori applicativi e di parsing vengono serializzati nel protocollo; il bridge non emette traceback su `stdout`.
+
+## JSON Schema
+
+Il protocollo è descritto da:
+
+- `schemas/tutor-service-bridge-request.schema.json`;
+- `schemas/tutor-service-bridge-response.schema.json`.
+
+Lo schema della request distingue `plan` e `transition`: il planning richiede una request TutorLab nel payload e può ricevere `seed`; la transition richiede `session_result`, `metadata.subject` e `metadata.session` e non accetta `seed`.
+
+Il runtime non dipende da `jsonschema`. Gli schema sono un contratto verificabile per integrazione e test, mentre il bridge mantiene validazione runtime leggera e autonoma.
 
 ## Planning
 
@@ -72,23 +114,29 @@ Una sessione non può essere applicata a una materia diversa da quella per cui �
 
 ## Proprietà verificate
 
+`tools/check_tutor_service_bridge_schemas.py` verifica la validità Draft 2020-12 dei due schema bridge e casi positivi/negativi degli envelope.
+
 `tools/check_tutor_service_bridge.py` verifica:
 
 - planning riuscito tramite processo separato;
+- `bridge_version` su ogni risposta;
 - determinismo con snapshot/request/seed uguali;
 - immutabilità dello snapshot in planning;
 - round-trip `plan -> transition`;
 - produzione di evidence, snapshot update e next step;
 - protezione cross-subject;
+- codici errore stabili;
 - operazioni sconosciute;
+- versione bridge non supportata;
+- campi envelope sconosciuti;
 - payload mancante;
-- seed non valido;
+- seed non valido e seed vietato su transition;
 - request JSON non-object;
 - JSON malformato;
 - input vuoto;
 - assenza di output diagnostico su `stderr` nei casi gestiti.
 
-Il controllo è incluso nel runner canonico `tools/run_local_validation.py`.
+Entrambi i controlli sono inclusi nel runner canonico `tools/run_local_validation.py`.
 
 ## Vincoli
 
