@@ -17,6 +17,7 @@
 - [x] **Math + English Upper Secondary v0.8: copertura eseguibile 1ª-5ª superiore**
 - [x] **Longitudinal Reliability v0.9: traiettorie medie → maturità**
 - [x] **Tutor Experience + Hub Scuola Contract v1.0: facade applicativo, comandi tutor e round-trip dati**
+- [ ] **Local Integration Bridge v1.1: protocollo JSON versionato per integrazione locale con Hub Scuola**
 
 I macro-blocchi sono l'unità di avanzamento del progetto. Le attività interne possono essere granulari, ma un blocco è completo solo quando produce un sottosistema coerente, documentato e verificabile.
 
@@ -166,3 +167,20 @@ TutorLab 1.0 può ricevere uno stato didattico, scegliere un obiettivo coerente,
 ### Nota di validazione v1.0
 
 Il container di esecuzione non dispone di connettività HTTPS verso GitHub e non può effettuare un clone completo. Sono stati quindi eseguiti nel runtime i JSON Schema reali e una regressione eseguibile sui file runtime modificati (`session_engine.py` e `tutor_service.py`), includendo comportamento legacy senza `quantity_hint`, determinismo, priorità dei prerequisiti, assessment, quantità, fingerprint, Student View e protezione cross-subject. Il runner cumulativo resta versionato in `tools/run_local_validation.py` per esecuzione in un ambiente con checkout completo.
+
+## v1.1 — Local Integration Bridge
+
+Obiettivo: rendere TutorLab invocabile in modo deterministico dal server locale di Hub Scuola senza introdurre rete, cloud o dipendenze dallo storage applicativo.
+
+- [x] bridge JSON locale su stdin/stdout con operazioni `plan` e `transition`;
+- [x] protocollo bridge versionato separatamente dalla release TutorLab e dal contratto Hub;
+- [x] codici errore stabili indipendenti dalle classi di eccezione Python;
+- [x] JSON Schema Draft 2020-12 per request e response del bridge;
+- [x] schema distinti per planning e transition, incluso `seed` ammesso soltanto nel planning;
+- [x] round-trip `plan → objective_stack persistito da Hub → transition` coperto dal test dedicato;
+- [x] determinismo, immutabilità planning, protezione cross-subject e casi negativi del protocollo;
+- [x] documentazione del confine Node/Hub ↔ Python/TutorLab senza database condiviso;
+- [x] bridge e schema gate integrati nel runner locale cumulativo;
+- [ ] esecuzione di `python tools/run_local_validation.py` su un checkout completo prima del merge.
+
+Hub Scuola è un'app Next.js locale su `127.0.0.1`, quindi il bridge può essere invocato dal processo server Node tramite subprocess locale: nessuna API pubblica e nessun servizio cloud sono necessari. L'integrazione applicativa concreta resta lato Hub Scuola e deve continuare a usare il suo `src/core` come unico proprietario della logica dati.
