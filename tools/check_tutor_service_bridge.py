@@ -13,6 +13,7 @@ from examples.learning_snapshot.synthetic_cases import mathematics_case
 
 ROOT = Path(__file__).resolve().parents[1]
 BRIDGE = ROOT / "tools" / "tutor_service_bridge.py"
+BRIDGE_VERSION = "1.0"
 
 
 def call_raw(raw: str):
@@ -26,11 +27,22 @@ def call_raw(raw: str):
     )
     body = json.loads(completed.stdout)
     assert completed.stderr == "", completed.stderr
+    assert body["bridge_version"] == BRIDGE_VERSION
     return completed.returncode, body
 
 
 def call(request):
     return call_raw(json.dumps(request, ensure_ascii=False))
+
+
+def envelope(operation, payload, **extra):
+    request = {
+        "bridge_version": BRIDGE_VERSION,
+        "operation": operation,
+        "payload": payload,
+    }
+    request.update(extra)
+    return request
 
 
 def _all_correct_result(session):
@@ -55,9 +67,10 @@ def _all_correct_result(session):
     }
 
 
-def _assert_protocol_error(code, body, expected_type):
+def _assert_protocol_error(code, body, expected_code, expected_type="BridgeProtocolError"):
     assert code != 0
     assert body["ok"] is False
+    assert body["error"]["code"] == expected_code
     assert body["error"]["type"] == expected_type
     assert isinstance(body["error"]["message"], str)
     assert body["error"]["message"]
@@ -77,7 +90,7 @@ def main() -> int:
         },
     }
 
-    code, body = call({"operation": "plan", "payload": exchange, "seed": 91})
+    code, body = call(envelope("plan", exchange, seed=91))
     assert code == 0, body
     assert body["ok"] is True
     assert body["result"]["student_ref"] == exchange["student_ref"]
@@ -85,7 +98,7 @@ def main() -> int:
     assert plan["status"] == "ok"
     assert plan["session"]["duration_minutes"] == 30
 
-    repeated_code, repeated_body = call({"operation": "plan", "payload": exchange, "seed": 91})
+    repeated_code, repeated_body = call(envelope("plan", exchange, seed=91))
     assert repeated_code == 0, repeated_body
     assert repeated_body["result"]["plan"]["session"] == plan["session"], (
         "bridge plan must preserve TutorLab determinism"
@@ -104,9 +117,7 @@ def main() -> int:
             "session": session,
         },
     }
-    transition_code, transition_body = call(
-        {"operation": "transition", "payload": transition_exchange}
-    )
+    transition_code, transition_body = call(envelope("transition", transition_exchange))
     assert transition_code == 0, transition_body
     assert transition_body["ok"] is True
     assert transition_body["result"]["student_ref"] == exchange["student_ref"]
@@ -124,28 +135,60 @@ def main() -> int:
 
     wrong_subject = deepcopy(transition_exchange)
     wrong_subject["metadata"]["subject"] = "english"
-    wrong_code, wrong_body = call({"operation": "transition", "payload": wrong_subject})
-    _assert_protocol_error(wrong_code, wrong_body, "ValueError")
-
-    bad_code, bad_body = call({"operation": "unknown", "payload": {}})
-    _assert_protocol_error(bad_code, bad_body, "ValueError")
-
-    missing_payload_code, missing_payload_body = call({"operation": "plan"})
-    _assert_protocol_error(missing_payload_code, missing_payload_body, "ValueError")
-
-    bad_seed_code, bad_seed_body = call(
-        {"operation": "plan", "payload": exchange, "seed": True}
+    wrong_code, wrong_body = call(envelope("transition", wrong_subject))
+    _assert_protocol_error(
+        wrong_code,
+        wrong_body,
+        "TUTORLAB_VALIDATION_ERROR",
+        expected_type="ValueError",
     )
-    _assert_protocol_error(bad_seed_code, bad_seed_body, "ValueError")
+
+    bad_code, bad_body = call(envelope("unknown", {}))
+    _assert_protocol_error(bad_code, bad_body, "UNSUPPORTED_OPERATION")
+
+    missing_payload_code, missing_payload_body = call(
+        {"bridge_version": BRIDGE_VERSION, "operation": "plan"}
+    )
+    _assert_protocol_error(missing_payload_code, missing_payload_body, "INVALID_PAYLOAD")
+
+    bad_seed_code, bad_seed_body = call(envelope("plan", exchange, seed=True))
+    _assert_protocol_error(bad_seed_code, bad_seed_body, "INVALID_SEED")
+
+    wrong_version_code, wrong_version_body = call(
+        {"bridge_version": "2.0", "operation": "plan", "payload": exchange}
+    )
+    _assert_protocol_error(
+        wrong_version_code,
+        wrong_version_body,
+        "UNSUPPORTED_BRIDGE_VERSION",
+    )
+
+    extra_field_code, extra_field_body = call(envelope("plan", exchange, unexpected=True))
+    _assert_protocol_error(extra_field_code, extra_field_body, "INVALID_ENVELOPE")
+
+    transition_seed_code, transition_seed_body = call(
+        envelope("transition", transition_exchange, seed=1)
+    )
+    _assert_protocol_error(transition_seed_code, transition_seed_body, "INVALID_ENVELOPE")
+
+    invalid_exchange = deepcopy(exchange)
+    invalid_exchange["version"] = "2.0"
+    invalid_exchange_code, invalid_exchange_body = call(envelope("plan", invalid_exchange))
+    _assert_protocol_error(
+        invalid_exchange_code,
+        invalid_exchange_body,
+        "TUTORLAB_VALIDATION_ERROR",
+        expected_type="ValueError",
+    )
 
     non_object_code, non_object_body = call_raw("[]")
-    _assert_protocol_error(non_object_code, non_object_body, "ValueError")
+    _assert_protocol_error(non_object_code, non_object_body, "INVALID_ENVELOPE")
 
     invalid_json_code, invalid_json_body = call_raw("{not-json")
-    _assert_protocol_error(invalid_json_code, invalid_json_body, "JSONDecodeError")
+    _assert_protocol_error(invalid_json_code, invalid_json_body, "INVALID_JSON")
 
     empty_code, empty_body = call_raw("")
-    _assert_protocol_error(empty_code, empty_body, "ValueError")
+    _assert_protocol_error(empty_code, empty_body, "EMPTY_REQUEST")
 
     print("Tutor service JSON bridge v1.1: OK")
     return 0
