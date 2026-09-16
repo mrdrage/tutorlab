@@ -19,6 +19,9 @@ DEFAULT_BANDS={"recover":1,"consolidate":2,"advance":2,"extend":4,"reassess":2}
 ALLOWED_INTENTS = {"continue", "lesson", "practice", "assessment"}
 ALLOWED_SUBJECTS = {"mathematics", "english", "italian", "french", "spanish"}
 ALLOWED_REQUEST_FIELDS = {"subject","intent","target_competency_id","duration_minutes","max_challenge_band","quantity_hint","student_view","notes"}
+ALLOWED_COMPLETION_STATUSES = {"completed", "partial", "abandoned"}
+ALLOWED_RESPONSE_STATUSES = {"correct", "partially_correct", "incorrect", "not_completed", "needs_external_scoring"}
+ALLOWED_SUPPORT_LEVELS = {"none", "light_prompt", "structured_prompt", "worked_support", "direct_solution"}
 
 
 def load_policy() -> dict[str, Any]:
@@ -29,6 +32,13 @@ def _bounded_int(value: Any, low: int, high: int, field: str) -> None:
     if value is None:
         return
     if isinstance(value,bool) or not isinstance(value,int) or not low <= value <= high:
+        raise ValueError(f"{field} outside supported range")
+
+
+def _bounded_number(value: Any, low: float, high: float, field: str) -> None:
+    if value is None:
+        return
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not low <= float(value) <= high:
         raise ValueError(f"{field} outside supported range")
 
 
@@ -71,6 +81,82 @@ def _validate_exchange(exchange: dict[str, Any], *, require_request: bool = Fals
         raise ValueError("request is required")
     if require_result and not isinstance(exchange.get("session_result"),dict):
         raise ValueError("session_result is required")
+
+
+def _session_task_ids(session: dict[str, Any]) -> set[str]:
+    task_ids: set[str] = set()
+    for phase in session.get("phases", []):
+        if not isinstance(phase, dict):
+            raise ValueError("invalid session phase")
+        tasks = phase.get("tasks", [])
+        if not isinstance(tasks, list):
+            raise ValueError("invalid session tasks")
+        for task in tasks:
+            if not isinstance(task, dict):
+                raise ValueError("invalid session task")
+            task_id = task.get("task_id")
+            if not isinstance(task_id, str) or not task_id:
+                raise ValueError("invalid session task_id")
+            if task_id in task_ids:
+                raise ValueError("duplicate session task_id")
+            task_ids.add(task_id)
+    return task_ids
+
+
+def _validate_session_result(session_result: dict[str, Any], session: dict[str, Any]) -> None:
+    if not isinstance(session_result, dict):
+        raise ValueError("session_result must be an object")
+    if str(session_result.get("version")) != "0.1":
+        raise ValueError("unsupported session_result version")
+    session_id = session_result.get("session_id")
+    if not isinstance(session_id, str) or not session_id:
+        raise ValueError("session_result.session_id is required")
+    if session_id != session.get("session_id"):
+        raise ValueError("session_result does not match session")
+    completed_at = session_result.get("completed_at")
+    if not isinstance(completed_at, str) or not completed_at:
+        raise ValueError("session_result.completed_at is required")
+    completion_status = session_result.get("completion_status")
+    if completion_status not in ALLOWED_COMPLETION_STATUSES:
+        raise ValueError("invalid completion_status")
+    responses = session_result.get("responses")
+    if not isinstance(responses, list):
+        raise ValueError("session_result.responses must be an array")
+
+    task_ids = _session_task_ids(session)
+    seen: set[str] = set()
+    for item in responses:
+        if not isinstance(item, dict):
+            raise ValueError("session response must be an object")
+        task_id = item.get("task_id")
+        if not isinstance(task_id, str) or not task_id:
+            raise ValueError("response.task_id is required")
+        if task_id not in task_ids:
+            raise ValueError("response task does not belong to session")
+        if task_id in seen:
+            raise ValueError("duplicate response task_id")
+        seen.add(task_id)
+        if "response" not in item:
+            raise ValueError("response.response is required")
+        if item.get("status") not in ALLOWED_RESPONSE_STATUSES:
+            raise ValueError("invalid response status")
+        if item.get("support_used") not in ALLOWED_SUPPORT_LEVELS:
+            raise ValueError("invalid support_used")
+        _bounded_number(item.get("score"), 0.0, 1.0, "score")
+        _bounded_number(item.get("explanation_quality"), 0.0, 1.0, "explanation_quality")
+        _bounded_number(item.get("transfer_success"), 0.0, 1.0, "transfer_success")
+        tags = item.get("tags")
+        if tags is not None and (not isinstance(tags, list) or any(not isinstance(tag, str) for tag in tags)):
+            raise ValueError("invalid response tags")
+        observed_errors = item.get("observed_errors")
+        if observed_errors is not None and (
+            not isinstance(observed_errors, list)
+            or any(not isinstance(error, dict) for error in observed_errors)
+        ):
+            raise ValueError("invalid observed_errors")
+
+    if completion_status == "completed" and seen != task_ids:
+        raise ValueError("completed session_result must cover every session task")
 
 
 def _requested_action(intent: str, adaptive_action: str, selection_reason: str) -> str:
@@ -189,8 +275,11 @@ def record_result(
 ) -> dict[str, Any]:
     if subject not in ALLOWED_SUBJECTS or subject not in snapshot.get("subjects", {}):
         raise ValueError("invalid transition subject")
+    if not isinstance(session, dict):
+        raise ValueError("transition session must be an object")
     if session.get("subject") != subject:
         raise ValueError("session subject does not match transition subject")
+    _validate_session_result(session_result, session)
     policy = load_policy()
     return transition(snapshot, subject, session, session_result, policy)
 
@@ -211,6 +300,8 @@ def hub_transition(exchange: dict[str, Any]) -> dict[str, Any]:
     _validate_exchange(exchange,require_result=True)
     result = exchange["session_result"]
     metadata = exchange.get("metadata", {})
+    if not isinstance(metadata, dict):
+        raise ValueError("metadata must be an object")
     subject = metadata.get("subject")
     session = metadata.get("session")
     if not subject or not session:
