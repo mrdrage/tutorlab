@@ -1,20 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.local/schemas/session-result.schema.json",
   "title": "TutorLab Session Result",
   "type": "object",
   "required": ["version", "session_id", "completed_at", "completion_status", "responses"],
   "properties": {
     "version": {"const": "0.1"},
-    "session_id": {"type": "string"},
-    "completed_at": {"type": "string"},
+    "session_id": {"type": "string", "minLength": 1},
+    "completed_at": {"type": "string", "minLength": 1},
     "completion_status": {"enum": ["completed", "partial", "abandoned"]},
     "responses": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["task_id", "response", "status", "support_used"],
+        "required": ["task_id", "response", "support_used"],
         "properties": {
-          "task_id": {"type": "string"},
+          "task_id": {"type": "string", "minLength": 1},
           "response": {},
           "status": {"enum": ["correct", "partially_correct", "incorrect", "not_completed", "needs_external_scoring"]},
           "score": {"type": "number", "minimum": 0, "maximum": 1},
