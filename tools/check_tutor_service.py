@@ -25,6 +25,7 @@ def _all_correct_result(session):
         for task in phase.get("tasks", []):
             responses.append({
                 "task_id": task["task_id"],
+                "response": "synthetic-correct-response",
                 "status": "correct",
                 "score": 1.0,
                 "support_used": "none",
@@ -32,7 +33,10 @@ def _all_correct_result(session):
                 "explanation_quality": 0.9 if phase["kind"] == "explanation" else None,
             })
     return {
+        "version": "0.1",
+        "session_id": session["session_id"],
         "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completion_status": "completed",
         "responses": responses,
     }
 
@@ -122,6 +126,27 @@ def main() -> int:
     wrong_subject=deepcopy(roundtrip)
     wrong_subject["metadata"]["subject"]="english"
     _must_fail(lambda: hub_transition(wrong_subject),"cross-subject session transition accepted")
+
+    wrong_session=deepcopy(roundtrip)
+    wrong_session["session_result"]["session_id"]="another-session"
+    _must_fail(lambda: hub_transition(wrong_session),"session_result for another session accepted")
+
+    missing_response=deepcopy(roundtrip)
+    del missing_response["session_result"]["responses"][0]["response"]
+    _must_fail(lambda: hub_transition(missing_response),"response without response payload accepted")
+
+    unknown_task=deepcopy(roundtrip)
+    unknown_task["session_result"]["responses"][0]["task_id"]="unknown-task"
+    _must_fail(lambda: hub_transition(unknown_task),"unknown task response accepted")
+
+    incomplete_completed=deepcopy(roundtrip)
+    incomplete_completed["session_result"]["responses"]=incomplete_completed["session_result"]["responses"][:-1]
+    _must_fail(lambda: hub_transition(incomplete_completed),"completed result missing a task accepted")
+
+    partial=deepcopy(roundtrip)
+    partial["session_result"]["completion_status"]="partial"
+    partial["session_result"]["responses"]=partial["session_result"]["responses"][:-1]
+    hub_transition(partial)
 
     missing_student=deepcopy(exchange)
     missing_student["student_ref"]={}

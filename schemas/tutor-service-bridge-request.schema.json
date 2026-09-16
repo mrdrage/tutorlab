@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tutorlab.local/schemas/tutor-service-bridge-request.schema.json",
+  "title": "TutorLab JSON Bridge Request",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bridge_version", "operation", "payload"],
+      "properties": {
+        "bridge_version": {"const": "1.0"},
+        "operation": {"const": "plan"},
+        "seed": {"type": "integer"},
+        "payload": {
+          "allOf": [
+            {"$ref": "hub-exchange.schema.json"},
+            {"required": ["request"]}
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bridge_version", "operation", "payload"],
+      "properties": {
+        "bridge_version": {"const": "1.0"},
+        "operation": {"const": "transition"},
+        "payload": {
+          "allOf": [
+            {"$ref": "hub-exchange.schema.json"},
+            {
+              "required": ["session_result", "metadata"],
+              "properties": {
+                "session_result": {"$ref": "session-result.schema.json"},
+                "metadata": {
+                  "type": "object",
+                  "required": ["subject", "session"],
+                  "properties": {
+                    "subject": {
+                      "enum": ["mathematics", "english", "italian", "french", "spanish"]
+                    },
+                    "session": {"type": "object"}
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
