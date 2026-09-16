@@ -32,7 +32,7 @@
             {
               "required": ["session_result", "metadata"],
               "properties": {
-                "session_result": {"type": "object"},
+                "session_result": {"$ref": "session-result.schema.json"},
                 "metadata": {
                   "type": "object",
                   "required": ["subject", "session"],
