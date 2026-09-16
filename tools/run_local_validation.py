@@ -33,6 +33,7 @@ CHECKS = (
     "tools/calibrate_longitudinal_8y.py",
     "tools/check_tutor_contract_schemas.py",
     "tools/check_tutor_service.py",
+    "tools/check_tutor_service_bridge_schemas.py",
     "tools/check_tutor_service_bridge.py",
 )
 
