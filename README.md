@@ -25,7 +25,7 @@ Se emerge una lacuna nei prerequisiti, TutorLab può sospendere temporaneamente 
 
 ## Stato del progetto
 
-**TutorLab v1.0** è il baseline stabile su `main`.
+La linea **TutorLab 1.x** consolida il motore come servizio didattico indipendente e integrabile.
 
 La v1.0 comprende:
 
@@ -39,7 +39,7 @@ La v1.0 comprende:
 - Tutor View e Student View separate;
 - contratto dati v1.0 per l'integrazione con Hub Scuola.
 
-Il branch `integration/json-bridge-v1.1` sviluppa il passo successivo: un bridge JSON locale per invocare il facade TutorLab da processi esterni senza accoppiare il motore a database, UI o autenticazione.
+La v1.1 aggiunge un bridge JSON locale e versionato per invocare il facade TutorLab da processi esterni senza accoppiare il motore a database, UI o autenticazione. Il bridge mantiene separati il versionamento della release TutorLab, del protocollo di trasporto e del contratto Hub Scuola.
 
 Per il dettaglio delle milestone vedere `ROADMAP.md`.
 
